@@ -1,0 +1,2045 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习激励系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            font-size: 28px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-title .icon { font-size: 22px; }
+
+        /* 余额卡片 */
+        .balance-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            text-align: center;
+        }
+        .balance-card .card-title {
+            color: white;
+            justify-content: center;
+        }
+        .balance-amount {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .balance-label {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        /* 打卡任务 */
+        .task-list { display: flex; flex-direction: column; gap: 10px; }
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+        .task-item:hover { background: #e9ecef; }
+        .task-item.completed {
+            background: #d4edda;
+            opacity: 0.8;
+        }
+        .task-item.completed .task-name {
+            text-decoration: line-through;
+            color: #155724;
+        }
+        .task-left { display: flex; align-items: center; gap: 12px; }
+        .task-check {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #667eea;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .task-check.checked {
+            background: #28a745;
+            border-color: #28a745;
+        }
+        .task-check:not(.checked):hover {
+            background: rgba(102,126,234,0.1);
+        }
+        .task-name { font-size: 15px; color: #333; }
+        .task-reward {
+            font-size: 14px;
+            color: #f5576c;
+            font-weight: bold;
+        }
+        .task-item.completed .task-reward { color: #28a745; }
+
+        /* 连击显示 */
+        .streak-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #fff3cd;
+            color: #856404;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-left: 10px;
+        }
+
+        /* 目标墙 */
+        .goal-list { display: flex; flex-direction: column; gap: 12px; }
+        .goal-item {
+            padding: 14px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+        .goal-item.achieved {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .goal-name { font-weight: bold; color: #333; }
+        .goal-reward { color: #f5576c; font-weight: bold; font-size: 14px; }
+        .goal-progress {
+            width: 100%;
+            height: 8px;
+            background: #dee2e6;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .goal-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .goal-item.achieved .goal-progress-bar {
+            background: #28a745;
+        }
+        .goal-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* 商店 */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+        .shop-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .shop-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        .shop-item .icon { font-size: 32px; margin-bottom: 8px; }
+        .shop-item .name { font-size: 14px; color: #333; margin-bottom: 4px; }
+        .shop-item .price { color: #f5576c; font-weight: bold; font-size: 13px; }
+
+        /* 本周统计 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* 底部操作区 */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* 记录列表 */
+        .record-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .record-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        .record-item .time { color: #999; font-size: 12px; }
+        .record-item .amount-positive { color: #28a745; font-weight: bold; }
+        .record-item .amount-negative { color: #dc3545; font-weight: bold; }
+
+        /* 弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+        }
+        .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 16px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 14px; color: #666; margin-bottom: 4px; }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 16px;
+        }
+
+        /* 标签页 */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+        .tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            background: #f8f9fa;
+            color: #666;
+            border: none;
+        }
+        .tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* 管理员密码 */
+        .admin-hint {
+            text-align: center;
+            color: white;
+            opacity: 0.7;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(102,126,234,0.3); border-radius: 3px; }
+
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+            .shop-grid { grid-template-columns: repeat(2, 1fr); }
+            .balance-amount { font-size: 36px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>学习激励系统</h1>
+
+        <!-- 余额卡片 -->
+        <div class="card balance-card">
+            <div class="card-title"><span class="icon">💰</span> 当前余额</div>
+            <div class="balance-amount" id="balance">¥0.00</div>
+            <div class="balance-label">完成任务赚取奖励，兑换心仪物品</div>
+            <div style="margin-top: 15px;">
+                <span class="streak-badge">🔥 早睡连击: <span id="sleepStreak">0</span>天</span>
+                <span class="streak-badge">📚 学习连击: <span id="studyStreak">0</span>天</span>
+            </div>
+        </div>
+
+        <!-- 标签页切换 -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('tasks')">📋 今日打卡</button>
+            <button class="tab" onclick="switchTab('goals')">🎯 目标墙</button>
+            <button class="tab" onclick="switchTab('shop')">🛒 兑换商店</button>
+            <button class="tab" onclick="switchTab('stats')">📊 本周统计</button>
+            <button class="tab" onclick="switchTab('records')">📒 收支记录</button>
+            <button class="tab" onclick="switchTab('admin')">⚙️ 管理</button>
+        </div>
+
+        <!-- 今日打卡 -->
+        <div class="tab-content active" id="tab-tasks">
+            <div class="card">
+                <div class="card-title"><span class="icon">📋</span> 今日打卡任务 <span style="font-size:13px;color:#999;font-weight:normal;">(点击圆圈完成)</span></div>
+                <div class="task-list" id="taskList"></div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="icon">⚡</span> 快捷操作</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <button class="btn btn-primary" onclick="addCustomTask()">➕ 添加临时任务</button>
+                    <button class="btn btn-danger" onclick="addPenalty()">➖ 记录惩罚</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 目标墙 -->
+        <div class="tab-content" id="tab-goals">
+            <div class="card">
+                <div class="card-title"><span class="icon">🎯</span> 考试目标 <span style="font-size:13px;color:#999;font-weight:normal;">(管理员可更新分数)</span></div>
+                <div class="goal-list" id="goalList"></div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="icon">🏆</span> 年级排名目标 <span style="font-size:13px;color:#999;font-weight:normal;">(月考/期中期末，排名越靠前奖励越高)</span></div>
+                <div class="goal-list" id="rankGoalList"></div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="icon">✨</span> 习惯目标</div>
+                <div class="goal-list" id="habitGoalList"></div>
+            </div>
+        </div>
+
+        <!-- 兑换商店 -->
+        <div class="tab-content" id="tab-shop">
+            <div class="card">
+                <div class="card-title"><span class="icon">🎮</span> 娱乐兑换</div>
+                <div class="shop-grid" id="shopEntertainment"></div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="icon">🎁</span> 实物/现金兑换</div>
+                <div class="shop-grid" id="shopPhysical"></div>
+            </div>
+        </div>
+
+        <!-- 本周统计 -->
+        <div class="tab-content" id="tab-stats">
+            <div class="card">
+                <div class="card-title"><span class="icon">📊</span> 本周表现</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="weekTasks">0</div>
+                        <div class="stat-label">完成任务</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="weekEarnings">0</div>
+                        <div class="stat-label">赚取金额</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="weekSleep">0</div>
+                        <div class="stat-label">早睡天数</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span class="icon">📈</span> 近7天打卡趋势</div>
+                <div id="weekTrend" style="display:flex;justify-content:space-around;align-items:flex-end;height:120px;padding:10px 0;"></div>
+            </div>
+        </div>
+
+        <!-- 收支记录 -->
+        <div class="tab-content" id="tab-records">
+            <div class="card">
+                <div class="card-title"><span class="icon">📒</span> 收支明细</div>
+                <div class="record-list" id="recordList"></div>
+            </div>
+        </div>
+
+        <!-- 管理后台 -->
+        <div class="tab-content" id="tab-admin">
+            <div class="card" id="adminLoginCard">
+                <div class="card-title"><span class="icon">🔐</span> 管理后台</div>
+                <div style="text-align:center;padding:20px;">
+                    <p style="color:#666;margin-bottom:15px;">请输入管理员密码进入后台</p>
+                    <input type="password" id="adminPwdInput" placeholder="密码" style="padding:10px 15px;border:1px solid #ddd;border-radius:8px;font-size:16px;width:180px;text-align:center;">
+                    <br><br>
+                    <button class="btn btn-primary" onclick="adminLogin()">进入后台</button>
+                </div>
+            </div>
+            <div id="adminPanel" style="display:none;">
+                <!-- 余额管理 -->
+                <div class="card">
+                    <div class="card-title"><span class="icon">💰</span> 余额调整</div>
+                    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                        <span>当前余额: <strong id="adminBalance">¥0.00</strong></span>
+                        <input type="number" id="adjustAmount" placeholder="金额" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:100px;">
+                        <button class="btn btn-success" onclick="adjustBalance(1)">➕ 增加</button>
+                        <button class="btn btn-danger" onclick="adjustBalance(-1)">➖ 扣减</button>
+                    </div>
+                </div>
+
+                <!-- 任务管理 -->
+                <div class="card">
+                    <div class="card-title"><span class="icon">📋</span> 任务管理 <span style="font-size:12px;color:#999;">（点击任务可删除）</span></div>
+                    <div id="adminTaskList" style="margin-bottom:15px;"></div>
+                    <div style="background:#f8f9fa;padding:15px;border-radius:10px;">
+                        <div style="font-weight:bold;margin-bottom:10px;">添加新任务</div>
+                        <div style="display:flex;flex-direction:column;gap:8px;">
+                            <input type="text" id="newTaskName" placeholder="任务名称" style="padding:8px;border:1px solid #ddd;border-radius:6px;">
+                            <div style="display:flex;gap:8px;">
+                                <input type="number" id="newTaskReward" placeholder="奖励金额" value="5" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:100px;">
+                                <select id="newTaskType" style="padding:8px;border:1px solid #ddd;border-radius:6px;">
+                                    <option value="daily">日常</option>
+                                    <option value="weekly">周常</option>
+                                    <option value="custom">临时</option>
+                                </select>
+                            </div>
+                            <div style="font-size:13px;color:#666;">适用星期（可多选）:</div>
+                            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                                <label style="display:flex;align-items:center;gap:4px;font-size:13px;"><input type="checkbox" class="day-check" value="1" checked> 周一</label>
+                                <label style="display:flex;align-items:center;gap:4px;font-size:13px;"><input type="checkbox" class="day-check" value="2" checked> 周二</label>
+                                <label style="display:flex;align-items:center;gap:4px;font-size:13px;"><input type="checkbox" class="day-check" value="3" checked> 周三</label>
+                                <label style="display:flex;align-items:center;gap:4px;font-size:13px;"><input type="checkbox" class="day-check" value="4" checked> 周四</label>
+                                <label style="display:flex;align-items:center;gap:4px;font-size:13px;"><input type="checkbox" class="day-check" value="5" checked> 周五</label>
+                                <label style="display:flex;align-items:center;gap:4px;font-size:13px;"><input type="checkbox" class="day-check" value="6" checked> 周六</label>
+                                <label style="display:flex;align-items:center;gap:4px;font-size:13px;"><input type="checkbox" class="day-check" value="0" checked> 周日</label>
+                            </div>
+                            <button class="btn btn-primary" onclick="addNewTask()" style="width:fit-content;">➕ 添加任务</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 考试目标管理 -->
+                <div class="card">
+                    <div class="card-title"><span class="icon">🎯</span> 考试目标管理</div>
+                    <div id="adminGoalList" style="margin-bottom:15px;"></div>
+                    <div style="background:#f8f9fa;padding:15px;border-radius:10px;">
+                        <div style="font-weight:bold;margin-bottom:10px;">添加新目标</div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <input type="text" id="newGoalSubject" placeholder="科目" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:80px;">
+                            <input type="number" id="newGoalTarget" placeholder="目标分" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:80px;">
+                            <input type="number" id="newGoalCurrent" placeholder="当前分" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:80px;">
+                            <input type="number" id="newGoalReward" placeholder="奖励" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:80px;">
+                            <button class="btn btn-primary" onclick="addNewGoal()">➕ 添加</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 排名目标管理 -->
+                <div class="card">
+                    <div class="card-title"><span class="icon">🏆</span> 年级排名目标管理</div>
+                    <div id="adminRankList" style="margin-bottom:15px;"></div>
+                </div>
+
+                <!-- 商店管理 -->
+                <div class="card">
+                    <div class="card-title"><span class="icon">🛒</span> 商店管理 <span style="font-size:12px;color:#999;">（点击商品可删除）</span></div>
+                    <div id="adminShopList" style="margin-bottom:15px;"></div>
+                    <div style="background:#f8f9fa;padding:15px;border-radius:10px;">
+                        <div style="font-weight:bold;margin-bottom:10px;">添加新商品</div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <input type="text" id="newShopName" placeholder="商品名称" style="padding:8px;border:1px solid #ddd;border-radius:6px;">
+                            <input type="number" id="newShopPrice" placeholder="价格" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:80px;">
+                            <select id="newShopType" style="padding:8px;border:1px solid #ddd;border-radius:6px;">
+                                <option value="entertainment">娱乐</option>
+                                <option value="physical">实物/现金</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="addNewShopItem()">➕ 添加</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 习惯目标管理 -->
+                <div class="card">
+                    <div class="card-title"><span class="icon">✨</span> 习惯目标管理</div>
+                    <div id="adminHabitList" style="margin-bottom:15px;"></div>
+                    <div style="background:#f8f9fa;padding:15px;border-radius:10px;">
+                        <div style="font-weight:bold;margin-bottom:10px;">添加新习惯目标</div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <input type="text" id="newHabitName" placeholder="目标名称" style="padding:8px;border:1px solid #ddd;border-radius:6px;">
+                            <input type="number" id="newHabitTarget" placeholder="目标次数" value="5" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:80px;">
+                            <input type="number" id="newHabitReward" placeholder="奖励" value="20" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:80px;">
+                            <select id="newHabitPeriod" style="padding:8px;border:1px solid #ddd;border-radius:6px;">
+                                <option value="week">每周</option>
+                                <option value="month">每月</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="addNewHabit()">➕ 添加</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据同步 -->
+                <div class="card">
+                    <div class="card-title"><span class="icon">🔄</span> 数据同步（电脑/手机互传）</div>
+                    <div style="display:flex;flex-direction:column;gap:12px;">
+                        <div>
+                            <div style="font-weight:bold;margin-bottom:8px;">📤 导出数据</div>
+                            <p style="font-size:13px;color:#666;margin-bottom:8px;">复制下方文本，发到微信，然后在另一台设备上粘贴导入</p>
+                            <textarea id="exportDataText" readonly style="width:100%;height:60px;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:12px;resize:none;"></textarea>
+                            <div style="display:flex;gap:8px;margin-top:8px;">
+                                <button class="btn btn-primary" onclick="exportData()">生成导出文本</button>
+                                <button class="btn" onclick="copyExportData()" style="background:#f8f9fa;color:#333;">复制到剪贴板</button>
+                            </div>
+                        </div>
+                        <div style="border-top:1px solid #eee;padding-top:12px;">
+                            <div style="font-weight:bold;margin-bottom:8px;">📥 导入数据</div>
+                            <p style="font-size:13px;color:#666;margin-bottom:8px;">粘贴从另一台设备复制的文本，覆盖当前数据</p>
+                            <textarea id="importDataText" placeholder="在此粘贴数据..." style="width:100%;height:60px;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:12px;resize:none;"></textarea>
+                            <button class="btn btn-success" onclick="importData()" style="margin-top:8px;">导入并覆盖</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 服务器同步 -->
+                <div class="card">
+                    <div class="card-title"><span class="icon">☁️</span> 服务器同步（电脑/手机实时同步）</div>
+                    <div style="display:flex;flex-direction:column;gap:12px;">
+                        <div style="font-size:13px;color:#666;">
+                            配置腾讯云服务器后，数据自动上传下载，手机电脑实时同步
+                        </div>
+                        <input type="text" id="serverUrl" placeholder="服务器地址，如 http://123.45.67.89:3000" value="" style="padding:8px;border:1px solid #ddd;border-radius:6px;">
+                        <input type="text" id="serverKey" placeholder="API密钥" value="" style="padding:8px;border:1px solid #ddd;border-radius:6px;">
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn btn-primary" onclick="saveServerConfig()">保存配置</button>
+                            <button class="btn" onclick="testServerConnection()" style="background:#f8f9fa;color:#333;">测试连接</button>
+                        </div>
+                        <div id="syncStatus" style="font-size:13px;color:#666;min-height:20px;"></div>
+                        <div style="border-top:1px solid #eee;padding-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+                            <button class="btn btn-success" onclick="syncFromServer()">⬇️ 从服务器恢复</button>
+                            <button class="btn btn-primary" onclick="syncToServer()">⬆️ 上传至服务器</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 系统设置 -->
+                <div class="card">
+                    <div class="card-title"><span class="icon">⚙️</span> 系统设置</div>
+                    <div style="display:flex;flex-direction:column;gap:12px;">
+                        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                            <span>修改管理员密码:</span>
+                            <input type="password" id="newAdminPwd" placeholder="新密码" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:120px;">
+                            <button class="btn btn-primary" onclick="changeAdminPwd()">修改</button>
+                        </div>
+                        <div style="border-top:1px solid #eee;padding-top:12px;">
+                            <button class="btn btn-danger" onclick="clearAllData()">🗑️ 清空所有数据（不可恢复）</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗：添加任务 -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modalTitle">标题</div>
+            <div id="modalBody"></div>
+            <div class="modal-actions">
+                <button class="btn" onclick="closeModal()" style="background:#f8f9fa;color:#333;">取消</button>
+                <button class="btn btn-primary" onclick="modalConfirm()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-hint">管理员密码用于发放考试/排名奖励，可在⚙️管理中修改 | 长按"本周统计"标签可清空数据</div>
+
+    <script>
+        // ==================== 数据管理 ====================
+        // 时间表：周一到周五 6:30-22:00 在校；周五 16:30 放学；周六白天在家，晚上竞赛；周日 8:00-22:00 在校
+        // 只保留家长可明确验证的打卡项，去掉孩子主观判断的内容
+        const DEFAULT_TASKS = [
+            // === 学习类 ===
+            // 每天必做（家长亲眼确认）
+            { id: 'sleep', name: '11:00前上床关灯睡觉', reward: 5, type: 'daily', icon: '😴', days: [0,1,2,3,4,5,6] },
+            // 周一到周五（回家后可验证）
+            { id: 'english_words', name: '每天背诵20个单词，晚上回家家长抽查过关', reward: 3, type: 'daily', icon: '📝', days: [1,2,3,4,5] },
+            // 周五（家长19:00回家检查）
+            { id: 'friday_study', name: '周五下午学习妈妈买的英语课程1-2课，要有学习记录（观看记录，笔记等）', reward: 10, type: 'weekly', icon: '📚', days: [5] },
+            // 周六（家长全天可监督）
+            { id: 'saturday_deep', name: '周六上午深度学习2小时（家长监督）', reward: 15, type: 'weekly', icon: '✏️', days: [6] },
+            { id: 'saturday_review', name: '周六整理本周错题，家长检查成果', reward: 10, type: 'weekly', icon: '📂', days: [6] },
+            // === 家务类 ===
+            // 每天可做（简单）
+            { id: 'trash', name: '倒垃圾/扔垃圾袋', reward: 1, type: 'daily', icon: '🗑️', days: [0,1,2,3,4,5,6] },
+            // 周末家务（家长可检查）
+            { id: 'laundry', name: '洗衣服并晾晒/收纳自己衣服', reward: 5, type: 'weekly', icon: '👕', days: [6] },
+            { id: 'dishes', name: '周末洗碗/收拾餐桌一次', reward: 3, type: 'weekly', icon: '🍽️', days: [0,6] },
+            { id: 'room', name: '整理自己房间（床铺+桌面+地面）', reward: 5, type: 'weekly', icon: '🛏️', days: [6] },
+        ];
+
+        // 每科从及格(60)到满分(100)，每10分一个阶梯目标
+        // 解锁规则：达成前一个目标，才能挑战下一个
+        const DEFAULT_GOALS = [
+            // 英语（满分150，当前46）
+            { id: 'en90', subject: '英语', target: 90, current: 46, reward: 50, achieved: false, locked: false },
+            { id: 'en100', subject: '英语', target: 100, current: 46, reward: 80, achieved: false, locked: true },
+            { id: 'en110', subject: '英语', target: 110, current: 46, reward: 120, achieved: false, locked: true },
+            { id: 'en120', subject: '英语', target: 120, current: 46, reward: 180, achieved: false, locked: true },
+            { id: 'en130', subject: '英语', target: 130, current: 46, reward: 250, achieved: false, locked: true },
+            { id: 'en140', subject: '英语', target: 140, current: 46, reward: 350, achieved: false, locked: true },
+            { id: 'en150', subject: '英语', target: 150, current: 46, reward: 500, achieved: false, locked: true },
+            // 语文（满分150，当前99）
+            { id: 'cn90', subject: '语文', target: 90, current: 99, reward: 30, achieved: false, locked: false },
+            { id: 'cn100', subject: '语文', target: 100, current: 99, reward: 50, achieved: false, locked: true },
+            { id: 'cn110', subject: '语文', target: 110, current: 99, reward: 80, achieved: false, locked: true },
+            { id: 'cn120', subject: '语文', target: 120, current: 99, reward: 120, achieved: false, locked: true },
+            { id: 'cn130', subject: '语文', target: 130, current: 99, reward: 180, achieved: false, locked: true },
+            { id: 'cn140', subject: '语文', target: 140, current: 99, reward: 250, achieved: false, locked: true },
+            { id: 'cn150', subject: '语文', target: 150, current: 99, reward: 350, achieved: false, locked: true },
+            // 数学（满分150，当前118）
+            { id: 'ma90', subject: '数学', target: 90, current: 118, reward: 30, achieved: false, locked: false },
+            { id: 'ma100', subject: '数学', target: 100, current: 118, reward: 50, achieved: false, locked: true },
+            { id: 'ma110', subject: '数学', target: 110, current: 118, reward: 80, achieved: false, locked: true },
+            { id: 'ma120', subject: '数学', target: 120, current: 118, reward: 120, achieved: false, locked: true },
+            { id: 'ma130', subject: '数学', target: 130, current: 118, reward: 180, achieved: false, locked: true },
+            { id: 'ma140', subject: '数学', target: 140, current: 118, reward: 250, achieved: false, locked: true },
+            { id: 'ma150', subject: '数学', target: 150, current: 118, reward: 350, achieved: false, locked: true },
+            // 物理（满分100，当前55）
+            { id: 'ph60', subject: '物理', target: 60, current: 55, reward: 50, achieved: false, locked: false },
+            { id: 'ph70', subject: '物理', target: 70, current: 55, reward: 80, achieved: false, locked: true },
+            { id: 'ph80', subject: '物理', target: 80, current: 55, reward: 120, achieved: false, locked: true },
+            { id: 'ph90', subject: '物理', target: 90, current: 55, reward: 180, achieved: false, locked: true },
+            { id: 'ph100', subject: '物理', target: 100, current: 55, reward: 250, achieved: false, locked: true },
+            // 化学（满分100，当前37）
+            { id: 'ch60', subject: '化学', target: 60, current: 37, reward: 50, achieved: false, locked: false },
+            { id: 'ch70', subject: '化学', target: 70, current: 37, reward: 80, achieved: false, locked: true },
+            { id: 'ch80', subject: '化学', target: 80, current: 37, reward: 120, achieved: false, locked: true },
+            { id: 'ch90', subject: '化学', target: 90, current: 37, reward: 180, achieved: false, locked: true },
+            { id: 'ch100', subject: '化学', target: 100, current: 37, reward: 250, achieved: false, locked: true },
+            // 生物（满分100，当前82）
+            { id: 'bi60', subject: '生物', target: 60, current: 82, reward: 30, achieved: false, locked: false },
+            { id: 'bi70', subject: '生物', target: 70, current: 82, reward: 50, achieved: false, locked: true },
+            { id: 'bi80', subject: '生物', target: 80, current: 82, reward: 80, achieved: false, locked: true },
+            { id: 'bi90', subject: '生物', target: 90, current: 82, reward: 120, achieved: false, locked: true },
+            { id: 'bi100', subject: '生物', target: 100, current: 82, reward: 180, achieved: false, locked: true },
+        ];
+
+        const DEFAULT_RANK_GOALS = [
+            { id: 'rk300', name: '年级前300名', target: 300, current: 999, reward: 300, achieved: false },
+            { id: 'rk200', name: '年级前200名', target: 200, current: 999, reward: 400, achieved: false, locked: true },
+            { id: 'rk150', name: '年级前150名', target: 150, current: 999, reward: 500, achieved: false, locked: true },
+            { id: 'rk100', name: '年级前100名', target: 100, current: 999, reward: 800, achieved: false, locked: true },
+            { id: 'rk50', name: '年级前50名', target: 50, current: 999, reward: 1000, achieved: false, locked: true },
+        ];
+
+        const DEFAULT_HABIT_GOALS = [
+            // linkedTask: 关联的任务ID，任务完成时自动累加进度
+            // claimed: 本周期是否已经领取过奖励
+            { id: 'week_sleep', name: '一周早睡5天以上', target: 5, current: 0, reward: 20, period: 'week', linkedTask: 'sleep', claimed: false },
+            { id: 'week_words', name: '一周单词打卡5天以上', target: 5, current: 0, reward: 15, period: 'week', linkedTask: 'english_words', claimed: false },
+            { id: 'month_save', name: '一个月不透支余额', target: 1, current: 0, reward: 100, period: 'month', claimed: false }, // 此项特殊，通过余额检查自动累加
+        ];
+
+        const DEFAULT_SHOP = [
+            { id: 'game1', name: '1小时游戏时间', price: 15, type: 'entertainment', icon: '🎮' },
+            { id: 'game2', name: '周末2小时游戏', price: 25, type: 'entertainment', icon: '🕹️' },
+            { id: 'video', name: '1小时短视频', price: 10, type: 'entertainment', icon: '📱' },
+            { id: 'movie', name: '周末看电影一次', price: 40, type: 'entertainment', icon: '🎬' },
+            { id: 'snack', name: '零食/奶茶基金20元', price: 20, type: 'physical', icon: '🧋' },
+            { id: 'cash50', name: '提现50元现金', price: 50, type: 'physical', icon: '💵' },
+            { id: 'cash100', name: '提现100元现金', price: 100, type: 'physical', icon: '💵' },
+            { id: 'cash200', name: '提现200元现金', price: 200, type: 'physical', icon: '💵' },
+            { id: 'cash500', name: '提现500元现金', price: 500, type: 'physical', icon: '💵' },
+            { id: 'book', name: '自选书籍一本', price: 80, type: 'physical', icon: '📚' },
+            { id: 'outing', name: '外出聚餐/活动一次', price: 100, type: 'physical', icon: '🍔' },
+            { id: 'anything', name: '自定义购买任何东西', price: 1, type: 'physical', icon: '🛍️' },
+        ];
+
+        function loadData() {
+            const data = localStorage.getItem('studySystem_v2');
+            if (data) {
+                const parsed = JSON.parse(data);
+                // 如果目标结构版本变化，重置目标但保留余额和记录
+                if (parsed._goalsVersion !== 2) {
+                    const oldGoals = parsed.goals || [];
+                    parsed.goals = JSON.parse(JSON.stringify(DEFAULT_GOALS));
+                    parsed._goalsVersion = 2;
+                    // 保留已有的 current 值（如果用户之前更新过）
+                    parsed.goals.forEach(g => {
+                        const old = oldGoals.find(og => og.subject === g.subject);
+                        if (old && old.current) g.current = old.current;
+                    });
+                    saveData(parsed);
+                }
+                return parsed;
+            }
+            return {
+                balance: 0,
+                tasks: JSON.parse(JSON.stringify(DEFAULT_TASKS)),
+                goals: JSON.parse(JSON.stringify(DEFAULT_GOALS)),
+                rankGoals: JSON.parse(JSON.stringify(DEFAULT_RANK_GOALS)),
+                habitGoals: JSON.parse(JSON.stringify(DEFAULT_HABIT_GOALS)),
+                shop: JSON.parse(JSON.stringify(DEFAULT_SHOP)),
+                records: [],
+                history: {},
+                streaks: { sleep: 0, study: 0 },
+                lastDate: new Date().toDateString(),
+                adminPwd: '1234',
+                _goalsVersion: 2,
+            };
+        }
+
+        function saveData(data) {
+            localStorage.setItem('studySystem_v2', JSON.stringify(data));
+            // 如果配置了服务器，自动上传到服务器（不阻塞）
+            const cfg = getServerConfig();
+            if (cfg.url) {
+                fetch(`${cfg.url}/data`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Api-Key': cfg.key },
+                    body: JSON.stringify(data)
+                }).catch(() => {});
+            }
+        }
+
+        function getTodayTasks() {
+            const day = new Date().getDay();
+            return data.tasks.filter(t => t.days && t.days.includes(day));
+        }
+
+        let data = loadData();
+
+        // 数据兼容：确保旧数据也有新字段
+        if (!data.rankGoals) {
+            data.rankGoals = JSON.parse(JSON.stringify(DEFAULT_RANK_GOALS));
+        }
+        if (!data.adminPwd) {
+            data.adminPwd = '1234';
+        }
+        // 习惯目标兼容：添加claimed字段和linkedTask字段
+        if (data.habitGoals) {
+            data.habitGoals.forEach(goal => {
+                if (goal.claimed === undefined) goal.claimed = false;
+                if (goal.id === 'week_sleep' && !goal.linkedTask) goal.linkedTask = 'sleep';
+                if (goal.id === 'week_words' && !goal.linkedTask) goal.linkedTask = 'english_words';
+            });
+        }
+        saveData(data);
+
+        // ==================== 服务器同步 ====================
+        function getServerConfig() {
+            const cfg = localStorage.getItem('studyServerConfig');
+            return cfg ? JSON.parse(cfg) : { url: '', key: '' };
+        }
+
+        function saveServerConfig() {
+            const url = document.getElementById('serverUrl').value.trim();
+            const key = document.getElementById('serverKey').value.trim();
+            localStorage.setItem('studyServerConfig', JSON.stringify({ url, key }));
+            document.getElementById('syncStatus').textContent = '✅ 配置已保存';
+            setTimeout(() => document.getElementById('syncStatus').textContent = '', 2000);
+        }
+
+        async function testServerConnection() {
+            const cfg = getServerConfig();
+            if (!cfg.url) { alert('请先填写服务器地址和密钥'); return; }
+            document.getElementById('syncStatus').textContent = '正在测试连接...';
+            try {
+                const res = await fetch(`${cfg.url}/data`, { headers: { 'X-Api-Key': cfg.key } });
+                if (res.ok) {
+                    document.getElementById('syncStatus').textContent = '✅ 连接成功！';
+                } else {
+                    document.getElementById('syncStatus').textContent = '❌ 连接失败：密钥错误或服务器无数据';
+                }
+            } catch (e) {
+                document.getElementById('syncStatus').textContent = '❌ 连接失败：' + e.message;
+            }
+        }
+
+        async function syncFromServer() {
+            const cfg = getServerConfig();
+            if (!cfg.url) { alert('请先配置服务器'); return; }
+            if (!confirm('从服务器恢复将覆盖当前所有数据，确定继续？')) return;
+            document.getElementById('syncStatus').textContent = '正在从服务器恢复...';
+            try {
+                const res = await fetch(`${cfg.url}/data`, { headers: { 'X-Api-Key': cfg.key } });
+                if (!res.ok) throw new Error('服务器返回错误');
+                const serverData = await res.json();
+                if (!serverData || Object.keys(serverData).length === 0) {
+                    alert('服务器上没有数据');
+                    document.getElementById('syncStatus').textContent = '';
+                    return;
+                }
+                // 覆盖本地数据
+                data = serverData;
+                saveData(data);
+                document.getElementById('syncStatus').textContent = '✅ 恢复成功！页面即将刷新...';
+                setTimeout(() => location.reload(), 1000);
+            } catch (e) {
+                document.getElementById('syncStatus').textContent = '❌ 恢复失败：' + e.message;
+            }
+        }
+
+        async function syncToServer() {
+            const cfg = getServerConfig();
+            if (!cfg.url) { alert('请先配置服务器'); return; }
+            document.getElementById('syncStatus').textContent = '正在上传到服务器...';
+            try {
+                const res = await fetch(`${cfg.url}/data`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Api-Key': cfg.key },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    document.getElementById('syncStatus').textContent = '✅ 上传成功！';
+                    setTimeout(() => document.getElementById('syncStatus').textContent = '', 3000);
+                } else {
+                    throw new Error('服务器拒绝保存');
+                }
+            } catch (e) {
+                document.getElementById('syncStatus').textContent = '❌ 上传失败：' + e.message;
+            }
+        }
+
+        // 页面加载完成后，自动尝试从服务器同步（静默）
+        function autoSyncFromServer() {
+            const cfg = getServerConfig();
+            if (!cfg.url) return;
+            fetch(`${cfg.url}/data`, { headers: { 'X-Api-Key': cfg.key } })
+                .then(res => res.ok ? res.json() : null)
+                .then(serverData => {
+                    if (serverData && Object.keys(serverData).length > 0) {
+                        // 简单判断：如果服务器数据的记录数比本地多，就用服务器的
+                        const localRecords = data.records ? data.records.length : 0;
+                        const serverRecords = serverData.records ? serverData.records.length : 0;
+                        if (serverRecords > localRecords) {
+                            data = serverData;
+                            saveData(data);
+                            location.reload();
+                        }
+                    }
+                })
+                .catch(() => {});
+        }
+
+        // ==================== 初始化与日期检查 ====================
+        function checkNewDay() {
+            const today = new Date().toDateString();
+            if (data.lastDate !== today) {
+                // 保存昨天数据
+                const yesterday = new Date(data.lastDate);
+                const yesterdayKey = formatDate(yesterday);
+                const yesterdayDay = yesterday.getDay();
+
+                // 计算昨日"应该做的任务"完成数
+                const yesterdayTasks = data.tasks.filter(t => t.days && t.days.includes(yesterdayDay));
+                const completedCount = yesterdayTasks.filter(t => t.completed).length;
+                const sleepDone = yesterdayTasks.find(t => t.id === 'sleep')?.completed;
+
+                data.history[yesterdayKey] = {
+                    completed: completedCount,
+                    total: yesterdayTasks.length,
+                    earnings: data.records
+                        .filter(r => r.date === yesterdayKey && r.amount > 0)
+                        .reduce((sum, r) => sum + r.amount, 0),
+                    sleepDone: !!sleepDone,
+                };
+
+                // 检查连击（昨天该做的任务全部完成才算）
+                const allDone = yesterdayTasks.length > 0 && yesterdayTasks.every(t => t.completed);
+
+                if (allDone) {
+                    data.streaks.study++;
+                } else {
+                    data.streaks.study = 0;
+                }
+                if (sleepDone) {
+                    data.streaks.sleep++;
+                } else {
+                    data.streaks.sleep = 0;
+                }
+
+                // 连击奖励
+                if (data.streaks.sleep >= 3) {
+                    addRecord('早睡3天连击奖励', 10);
+                    data.balance += 10;
+                    data.streaks.sleep = 0;
+                }
+                if (data.streaks.study >= 3) {
+                    addRecord('全勤3天连击奖励', 15);
+                    data.balance += 15;
+                    data.streaks.study = 0;
+                }
+
+                // 习惯目标周期性重置
+                const todayDate = new Date();
+                const todayDay = todayDate.getDay(); // 0=周日, 1=周一, ...
+                const todayDateNum = todayDate.getDate(); // 1-31
+
+                // 每周一重置所有weekly习惯目标
+                if (todayDay === 1) {
+                    data.habitGoals.forEach(goal => {
+                        if (goal.period === 'week') {
+                            goal.current = 0;
+                            goal.claimed = false;
+                        }
+                    });
+                }
+
+                // 每月1日重置所有monthly习惯目标
+                if (todayDateNum === 1) {
+                    data.habitGoals.forEach(goal => {
+                        if (goal.period === 'month') {
+                            goal.current = 0;
+                            goal.claimed = false;
+                        }
+                    });
+                }
+
+                // "不透支余额"特殊目标：如果余额≥0，进度+1（每天检查）
+                data.habitGoals.forEach(goal => {
+                    if (goal.id === 'month_save' && data.balance >= 0 && goal.current < goal.target) {
+                        goal.current++;
+                    }
+                });
+
+                // 重置所有任务（跨天时全部重置，按新一天的星期几自动过滤显示）
+                data.tasks.forEach(t => t.completed = false);
+
+                data.lastDate = today;
+                saveData(data);
+            }
+        }
+
+        function formatDate(date) {
+            const d = new Date(date);
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        }
+
+        function getTodayKey() {
+            return formatDate(new Date());
+        }
+
+        // ==================== 记录管理 ====================
+        function addRecord(desc, amount) {
+            data.records.unshift({
+                date: getTodayKey(),
+                time: new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'}),
+                desc,
+                amount,
+            });
+            saveData(data);
+            render();
+        }
+
+        // ==================== 渲染 ====================
+        function render() {
+            document.getElementById('balance').textContent = `¥${data.balance.toFixed(2)}`;
+            document.getElementById('sleepStreak').textContent = data.streaks.sleep;
+            document.getElementById('studyStreak').textContent = data.streaks.study;
+
+            renderTasks();
+            renderGoals();
+            renderRankGoals();
+            renderHabitGoals();
+            renderShop();
+            renderStats();
+            renderRecords();
+        }
+
+        function renderTasks() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            const todayTasks = getTodayTasks();
+
+            // 添加今日提示
+            const dayNames = ['周日','周一','周二','周三','周四','周五','周六'];
+            const dayName = dayNames[new Date().getDay()];
+            const info = document.createElement('div');
+            info.style.cssText = 'font-size:13px;color:#667eea;margin-bottom:10px;padding:8px 12px;background:#f0f3ff;border-radius:8px;';
+            if (todayTasks.length <= 2) {
+                info.textContent = `今天是${dayName}，任务较少，保证睡眠优先 😴`;
+            } else if (new Date().getDay() === 5) {
+                info.textContent = `今天是${dayName}，下午放学后有黄金学习时间！📚`;
+            } else if (new Date().getDay() === 6) {
+                info.textContent = `今天是${dayName}，本周唯一整块学习时间，把握住！✏️`;
+            } else {
+                info.textContent = `今天是${dayName}，共${todayTasks.length}个任务`;
+            }
+            list.appendChild(info);
+
+            // 按学习类、家务类分组显示
+            const studyTasks = todayTasks.filter(t => !['trash','laundry','dishes','room'].includes(t.id));
+            const houseTasks = todayTasks.filter(t => ['trash','laundry','dishes','room'].includes(t.id));
+
+            if (studyTasks.length > 0) {
+                const studyLabel = document.createElement('div');
+                studyLabel.style.cssText = 'font-size:13px;color:#667eea;font-weight:bold;margin:10px 0 6px;';
+                studyLabel.textContent = '📚 学习任务';
+                list.appendChild(studyLabel);
+                studyTasks.forEach(task => list.appendChild(createTaskEl(task)));
+            }
+
+            if (houseTasks.length > 0) {
+                const houseLabel = document.createElement('div');
+                houseLabel.style.cssText = 'font-size:13px;color:#28a745;font-weight:bold;margin:10px 0 6px;';
+                houseLabel.textContent = '🏠 家务劳动';
+                list.appendChild(houseLabel);
+                houseTasks.forEach(task => list.appendChild(createTaskEl(task)));
+            }
+        }
+
+        function createTaskEl(task) {
+            const div = document.createElement('div');
+            div.className = `task-item ${task.completed ? 'completed' : ''}`;
+            div.innerHTML = `
+                <div class="task-left">
+                    <div class="task-check ${task.completed ? 'checked' : ''}" onclick="toggleTask('${task.id}')">
+                        ${task.completed ? '✓' : ''}
+                    </div>
+                    <span class="task-name">${task.icon} ${task.name}</span>
+                </div>
+                <span class="task-reward">+¥${task.reward}</span>
+            `;
+            return div;
+        }
+
+        function renderGoals() {
+            const list = document.getElementById('goalList');
+            list.innerHTML = '';
+
+            // 按科目分组渲染
+            const subjects = [...new Set(data.goals.map(g => g.subject))];
+            subjects.forEach(subject => {
+                const subjectGoals = data.goals.filter(g => g.subject === subject).sort((a, b) => a.target - b.target);
+
+                // 自动解锁：前一目标达成后，解锁下一目标
+                subjectGoals.forEach((goal, index) => {
+                    if (index === 0) {
+                        goal.locked = false; // 第一个目标永远解锁
+                    } else {
+                        const prevGoal = subjectGoals[index - 1];
+                        if (prevGoal.achieved) {
+                            goal.locked = false; // 前一个达成了，自动解锁
+                        }
+                    }
+                });
+
+                // 渲染科目标题
+                const subjectDiv = document.createElement('div');
+                subjectDiv.style.cssText = 'font-weight:bold;font-size:16px;color:#667eea;margin:15px 0 8px;padding-bottom:4px;border-bottom:2px solid #667eea;';
+                subjectDiv.textContent = `📚 ${subject}`;
+                list.appendChild(subjectDiv);
+
+                // 渲染该科目下的所有目标
+                subjectGoals.forEach(goal => {
+                    const percent = Math.min(100, Math.max(0, (goal.current / goal.target) * 100));
+                    const canAchieve = !goal.achieved && !goal.locked && goal.current >= goal.target;
+                    const statusText = goal.achieved ? '✅ 已达成' :
+                                      (goal.locked ? '🔒 需先完成上一级' :
+                                       (goal.current >= goal.target ? '✅ 可领取奖励' : `还差 ${goal.target - goal.current}分`));
+                    const div = document.createElement('div');
+                    div.className = `goal-item ${goal.achieved ? 'achieved' : ''}`;
+                    div.innerHTML = `
+                        <div class="goal-header">
+                            <span class="goal-name">${goal.target}分 ${goal.locked ? '🔒' : ''}</span>
+                            <span class="goal-reward">¥${goal.reward}</span>
+                        </div>
+                        <div class="goal-progress">
+                            <div class="goal-progress-bar" style="width: ${percent}%"></div>
+                        </div>
+                        <div class="goal-info">
+                            <span>当前: ${goal.current}分</span>
+                            <span>${statusText}</span>
+                        </div>
+                        ${canAchieve ? `<button class="btn btn-success" style="margin-top:8px;width:100%;" onclick="achieveGoal('${goal.id}')">达成目标，领取奖励</button>` : ''}
+                    `;
+                    list.appendChild(div);
+                });
+            });
+        }
+
+        function renderRankGoals() {
+            const list = document.getElementById('rankGoalList');
+            list.innerHTML = '';
+            // 按target从小到大排序（前50最难，排最后）
+            const sortedGoals = [...data.rankGoals].sort((a, b) => b.target - a.target);
+            sortedGoals.forEach(goal => {
+                // 排名目标是越靠前越难，需要检查更宽松的目标是否已达成
+                const easierGoal = sortedGoals.find(g => g.target > goal.target && !g.locked);
+                if (goal.locked && easierGoal && easierGoal.achieved) {
+                    goal.locked = false;
+                }
+
+                const div = document.createElement('div');
+                div.className = `goal-item ${goal.achieved ? 'achieved' : ''}`;
+                div.innerHTML = `
+                    <div class="goal-header">
+                        <span class="goal-name">${goal.name} ${goal.locked ? '🔒' : ''}</span>
+                        <span class="goal-reward">¥${goal.reward}</span>
+                    </div>
+                    <div class="goal-info">
+                        <span>当前排名: 第${goal.current}名</span>
+                        <span>${goal.achieved ? '✅ 已达成' : (goal.locked ? '需先完成前一级' : `未达成`)}</span>
+                    </div>
+                    ${!goal.achieved && !goal.locked ? `<button class="btn btn-success" style="margin-top:8px;width:100%;" onclick="achieveRankGoal('${goal.id}')">达成目标，领取奖励</button>` : ''}
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function renderHabitGoals() {
+            const list = document.getElementById('habitGoalList');
+            list.innerHTML = '';
+            data.habitGoals.forEach(goal => {
+                const div = document.createElement('div');
+                div.className = 'goal-item';
+                const periodText = goal.period === 'week' ? '本周' : '本月';
+                const percent = Math.min(100, Math.max(0, (goal.current / goal.target) * 100));
+                const isReady = goal.current >= goal.target && !goal.claimed;
+                const statusText = goal.claimed ? '✅ 奖励已领取' : (goal.current >= goal.target ? '✅ 可领取奖励' : '进行中');
+                div.innerHTML = `
+                    <div class="goal-header">
+                        <span class="goal-name">${goal.name}</span>
+                        <span class="goal-reward">¥${goal.reward}</span>
+                    </div>
+                    <div class="goal-progress">
+                        <div class="goal-progress-bar" style="width: ${percent}%"></div>
+                    </div>
+                    <div class="goal-info">
+                        <span>${periodText}: ${goal.current}/${goal.target}</span>
+                        <span>${statusText}</span>
+                    </div>
+                    ${isReady ? `<button class="btn btn-success" style="margin-top:8px;width:100%;" onclick="achieveHabitGoal('${goal.id}')">达成目标，领取奖励</button>` : ''}
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function renderShop() {
+            const ent = document.getElementById('shopEntertainment');
+            const phy = document.getElementById('shopPhysical');
+            ent.innerHTML = '';
+            phy.innerHTML = '';
+
+            data.shop.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'shop-item';
+                div.onclick = () => buyItem(item.id);
+                div.innerHTML = `
+                    <div class="icon">${item.icon}</div>
+                    <div class="name">${item.name}</div>
+                    <div class="price">¥${item.price}</div>
+                `;
+                if (item.type === 'entertainment') {
+                    ent.appendChild(div);
+                } else {
+                    phy.appendChild(div);
+                }
+            });
+        }
+
+        function renderStats() {
+            const today = new Date();
+            let weekTasks = 0;
+            let weekEarnings = 0;
+            let weekSleep = 0;
+
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                const key = formatDate(d);
+                const h = data.history[key];
+                if (h) {
+                    weekTasks += h.completed || 0;
+                    weekEarnings += h.earnings || 0;
+                    if (h.sleepDone) weekSleep++;
+                }
+            }
+
+            // 今天的也算上
+            const todayTasks = getTodayTasks();
+            const todayCompleted = todayTasks.filter(t => t.completed).length;
+            weekTasks += todayCompleted;
+            const todayEarnings = data.records
+                .filter(r => r.date === getTodayKey() && r.amount > 0)
+                .reduce((sum, r) => sum + r.amount, 0);
+            weekEarnings += todayEarnings;
+
+            // 今天早睡
+            if (todayTasks.find(t => t.id === 'sleep')?.completed) weekSleep++;
+
+            document.getElementById('weekTasks').textContent = weekTasks;
+            document.getElementById('weekEarnings').textContent = weekEarnings;
+            document.getElementById('weekSleep').textContent = weekSleep;
+
+            // 近7天趋势图
+            const trend = document.getElementById('weekTrend');
+            trend.innerHTML = '';
+            const days = ['日','一','二','三','四','五','六'];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                const key = formatDate(d);
+                const h = data.history[key];
+                const isToday = i === 0;
+                const completed = isToday ? todayCompleted : (h ? h.completed : 0);
+                const total = isToday ? todayTasks.length : (h ? h.total : 0);
+                const height = total > 0 ? (completed / total) * 100 : 0;
+
+                const bar = document.createElement('div');
+                bar.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;`;
+                bar.innerHTML = `
+                    <div style="width:30px;height:${Math.max(height, 5)}px;background:${isToday ? '#667eea' : (height >= 100 ? '#28a745' : '#dee2e6')};border-radius:4px;transition:all 0.3s;"></div>
+                    <span style="font-size:11px;color:#666;">${days[d.getDay()]}</span>
+                `;
+                trend.appendChild(bar);
+            }
+        }
+
+        function renderRecords() {
+            const list = document.getElementById('recordList');
+            list.innerHTML = '';
+            data.records.slice(0, 30).forEach(r => {
+                const div = document.createElement('div');
+                div.className = 'record-item';
+                div.innerHTML = `
+                    <div>
+                        <div>${r.desc}</div>
+                        <div class="time">${r.date} ${r.time}</div>
+                    </div>
+                    <div class="${r.amount >= 0 ? 'amount-positive' : 'amount-negative'}">
+                        ${r.amount >= 0 ? '+' : ''}¥${r.amount.toFixed(2)}
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // ==================== 交互 ====================
+        function toggleTask(taskId) {
+            const task = data.tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            task.completed = !task.completed;
+            if (task.completed) {
+                data.balance += task.reward;
+                addRecord(`完成: ${task.name}`, task.reward);
+                // 自动累加关联的习惯目标进度
+                data.habitGoals.forEach(goal => {
+                    if (goal.linkedTask === task.id && goal.current < goal.target) {
+                        goal.current++;
+                    }
+                });
+            } else {
+                data.balance -= task.reward;
+                addRecord(`取消: ${task.name}`, -task.reward);
+                // 取消时回退关联的习惯目标进度
+                data.habitGoals.forEach(goal => {
+                    if (goal.linkedTask === task.id && goal.current > 0) {
+                        goal.current--;
+                    }
+                });
+            }
+            saveData(data);
+            render();
+        }
+
+        function achieveGoal(goalId) {
+            const goal = data.goals.find(g => g.id === goalId);
+            if (!goal || goal.achieved) return;
+
+            // 管理员验证
+            const pwd = prompt('请输入管理员密码领取奖励:');
+            if (pwd !== data.adminPwd) {
+                alert('密码错误！');
+                return;
+            }
+
+            goal.achieved = true;
+            data.balance += goal.reward;
+            addRecord(`达成${goal.subject}${goal.target}分目标`, goal.reward);
+            saveData(data);
+            render();
+            alert(`🎉 恭喜达成${goal.subject}${goal.target}分目标！奖励¥${goal.reward}已发放！`);
+        }
+
+        function achieveRankGoal(goalId) {
+            const goal = data.rankGoals.find(g => g.id === goalId);
+            if (!goal || goal.achieved) return;
+
+            // 管理员验证
+            const pwd = prompt('请输入管理员密码领取奖励:');
+            if (pwd !== data.adminPwd) {
+                alert('密码错误！');
+                return;
+            }
+
+            goal.achieved = true;
+            data.balance += goal.reward;
+            addRecord(`达成${goal.name}目标`, goal.reward);
+            saveData(data);
+            render();
+            alert(`🎉 恭喜达成${goal.name}！奖励¥${goal.reward}已发放！可自由支配。`);
+        }
+
+        function achieveHabitGoal(goalId) {
+            const goal = data.habitGoals.find(g => g.id === goalId);
+            if (!goal) return;
+            if (goal.current < goal.target) {
+                alert('目标进度尚未达成！');
+                return;
+            }
+
+            // 管理员验证
+            const pwd = prompt('请输入管理员密码领取奖励:');
+            if (pwd !== data.adminPwd) {
+                alert('密码错误！');
+                return;
+            }
+
+            data.balance += goal.reward;
+            addRecord(`达成习惯目标: ${goal.name}`, goal.reward);
+            goal.claimed = true; // 标记本周期已领取，不清零current（继续显示超额完成）
+            saveData(data);
+            render();
+            alert(`🎉 ${goal.name}达成！奖励¥${goal.reward}已发放！本周已记录${goal.current}次，继续加油！`);
+        }
+
+        function buyItem(itemId) {
+            const item = data.shop.find(s => s.id === itemId);
+            if (!item) return;
+
+            // 自定义购买任何东西
+            if (itemId === 'anything') {
+                const html = `
+                    <div class="form-group">
+                        <label>想买什么</label>
+                        <input type="text" id="customItemName" placeholder="例如：新球鞋、耳机、手办...">
+                    </div>
+                    <div class="form-group">
+                        <label>金额（当前余额 ¥${data.balance.toFixed(2)}）</label>
+                        <input type="number" id="customItemPrice" value="100" min="1" max="${Math.floor(data.balance)}">
+                    </div>
+                `;
+                showModal('自定义购买', html, () => {
+                    const name = document.getElementById('customItemName').value.trim();
+                    const price = parseFloat(document.getElementById('customItemPrice').value) || 0;
+                    if (!name || price <= 0) return;
+                    if (price > data.balance) {
+                        alert('余额不足！');
+                        return;
+                    }
+                    if (!confirm(`确认购买"${name}"，支付¥${price.toFixed(2)}？`)) return;
+                    data.balance -= price;
+                    addRecord(`购买: ${name}`, -price);
+                    saveData(data);
+                    render();
+                    alert(`✅ 已下单！请找家长兑现"${name}"（¥${price.toFixed(2)}）`);
+                });
+                return;
+            }
+
+            if (data.balance < item.price) {
+                alert(`余额不足！还差¥${(item.price - data.balance).toFixed(2)}`);
+                return;
+            }
+
+            if (!confirm(`确认兑换"${item.name}"？需支付¥${item.price}`)) return;
+
+            data.balance -= item.price;
+            addRecord(`兑换: ${item.name}`, -item.price);
+            saveData(data);
+            render();
+            alert(`✅ 兑换成功！请找家长兑现"${item.name}"`);
+        }
+
+        // ==================== 弹窗与快捷操作 ====================
+        let modalCallback = null;
+
+        function showModal(title, html, onConfirm) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = html;
+            document.getElementById('modal').classList.add('show');
+            modalCallback = onConfirm;
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+            modalCallback = null;
+        }
+
+        function modalConfirm() {
+            if (modalCallback) modalCallback();
+            closeModal();
+        }
+
+        function addCustomTask() {
+            const html = `
+                <div class="form-group">
+                    <label>任务名称</label>
+                    <input type="text" id="customTaskName" placeholder="例如：整理错题本">
+                </div>
+                <div class="form-group">
+                    <label>奖励金额</label>
+                    <input type="number" id="customTaskReward" value="3" min="1">
+                </div>
+            `;
+            showModal('添加临时任务', html, () => {
+                const name = document.getElementById('customTaskName').value.trim();
+                const reward = parseFloat(document.getElementById('customTaskReward').value) || 3;
+                if (!name) return;
+
+                const id = 'custom_' + Date.now();
+                data.tasks.push({ id, name, reward, type: 'custom', icon: '⭐', completed: false });
+                saveData(data);
+                render();
+            });
+        }
+
+        function addPenalty() {
+            const html = `
+                <div class="form-group">
+                    <label>惩罚原因</label>
+                    <input type="text" id="penaltyReason" placeholder="例如：上课玩手机被抓">
+                </div>
+                <div class="form-group">
+                    <label>扣款金额</label>
+                    <input type="number" id="penaltyAmount" value="10" min="1">
+                </div>
+            `;
+            showModal('记录惩罚', html, () => {
+                const reason = document.getElementById('penaltyReason').value.trim();
+                const amount = parseFloat(document.getElementById('penaltyAmount').value) || 10;
+                if (!reason) return;
+
+                data.balance -= amount;
+                addRecord(`惩罚: ${reason}`, -amount);
+                saveData(data);
+                render();
+            });
+        }
+
+        // ==================== 标签页 ====================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+        }
+
+        // ==================== 长按清除数据 ====================
+        let pressTimer;
+        const statsTab = document.querySelector('.tab:nth-child(4)');
+        if (statsTab) {
+            statsTab.addEventListener('mousedown', () => {
+                pressTimer = setTimeout(() => {
+                    if (confirm('确定要清空所有数据吗？此操作不可恢复！')) {
+                        localStorage.removeItem('studySystem_v2');
+                        location.reload();
+                    }
+                }, 2000);
+            });
+            statsTab.addEventListener('mouseup', () => clearTimeout(pressTimer));
+            statsTab.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+            statsTab.addEventListener('touchstart', () => {
+                pressTimer = setTimeout(() => {
+                    if (confirm('确定要清空所有数据吗？此操作不可恢复！')) {
+                        localStorage.removeItem('studySystem_v2');
+                        location.reload();
+                    }
+                }, 2000);
+            });
+            statsTab.addEventListener('touchend', () => clearTimeout(pressTimer));
+        }
+
+        // ==================== 管理后台 ====================
+        let isAdmin = false;
+
+        function adminLogin() {
+            const pwd = document.getElementById('adminPwdInput').value;
+            if (pwd === data.adminPwd) {
+                isAdmin = true;
+                document.getElementById('adminLoginCard').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                renderAdmin();
+                document.getElementById('adminPwdInput').value = '';
+            } else {
+                alert('密码错误！');
+            }
+        }
+
+        function renderAdmin() {
+            document.getElementById('adminBalance').textContent = `¥${data.balance.toFixed(2)}`;
+            renderAdminTasks();
+            renderAdminGoals();
+            renderAdminRanks();
+            renderAdminHabits();
+            renderAdminShop();
+        }
+
+        function adjustBalance(direction) {
+            const amount = parseFloat(document.getElementById('adjustAmount').value);
+            if (isNaN(amount) || amount <= 0) return;
+            const change = direction * amount;
+            data.balance += change;
+            addRecord(change > 0 ? '管理员手动增加余额' : '管理员手动扣减余额', change);
+            saveData(data);
+            render();
+            renderAdmin();
+            document.getElementById('adjustAmount').value = '';
+        }
+
+        function renderAdminTasks() {
+            const list = document.getElementById('adminTaskList');
+            list.innerHTML = '';
+            const dayNames = ['日','一','二','三','四','五','六'];
+            data.tasks.forEach(task => {
+                const daysStr = task.days ? task.days.map(d => dayNames[d]).join('、') : '每天';
+                const div = document.createElement('div');
+                div.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee;font-size:14px;';
+                div.innerHTML = `
+                    <span>${task.icon} ${task.name} — ¥${task.reward}（${daysStr}）</span>
+                    <div style="display:flex;gap:6px;">
+                        <button class="btn btn-primary" style="padding:4px 10px;font-size:12px;" onclick="editTask('${task.id}')">编辑</button>
+                        <button class="btn btn-danger" style="padding:4px 10px;font-size:12px;" onclick="deleteTask('${task.id}')">删除</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function addNewTask() {
+            const name = document.getElementById('newTaskName').value.trim();
+            const reward = parseFloat(document.getElementById('newTaskReward').value) || 5;
+            const type = document.getElementById('newTaskType').value;
+            const days = Array.from(document.querySelectorAll('.day-check:checked')).map(cb => parseInt(cb.value));
+            if (!name || days.length === 0) {
+                alert('请输入任务名称并至少选择一个星期');
+                return;
+            }
+            const icons = ['📋','✅','⭐','🔥','💪','🎯','🌟'];
+            const icon = icons[Math.floor(Math.random() * icons.length)];
+            data.tasks.push({
+                id: 'task_' + Date.now(),
+                name, reward, type, icon, days,
+                completed: false
+            });
+            saveData(data);
+            render();
+            renderAdmin();
+            document.getElementById('newTaskName').value = '';
+        }
+
+        function deleteTask(id) {
+            if (!confirm('确定删除这个任务？')) return;
+            data.tasks = data.tasks.filter(t => t.id !== id);
+            saveData(data);
+            render();
+            renderAdmin();
+        }
+
+        function renderAdminGoals() {
+            const list = document.getElementById('adminGoalList');
+            list.innerHTML = '';
+            data.goals.forEach(goal => {
+                const div = document.createElement('div');
+                div.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee;font-size:14px;flex-wrap:wrap;gap:8px;';
+                div.innerHTML = `
+                    <span>${goal.subject} ${goal.target}分 — 当前${goal.current}分 — 奖¥${goal.reward} ${goal.achieved ? '✅' : (goal.locked ? '🔒' : '')}</span>
+                    <div style="display:flex;gap:6px;">
+                        <input type="number" value="${goal.current}" style="width:60px;padding:4px;border:1px solid #ddd;border-radius:4px;" onchange="updateGoalCurrent('${goal.id}', this.value)">
+                        <button class="btn btn-primary" style="padding:4px 10px;font-size:12px;" onclick="editGoal('${goal.id}')">编辑</button>
+                        <button class="btn btn-danger" style="padding:4px 10px;font-size:12px;" onclick="deleteGoal('${goal.id}')">删除</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function updateGoalCurrent(id, value) {
+            const goal = data.goals.find(g => g.id === id);
+            if (goal) {
+                goal.current = parseFloat(value) || 0;
+                saveData(data);
+                render();
+                renderAdmin();
+            }
+        }
+
+        function addNewGoal() {
+            const subject = document.getElementById('newGoalSubject').value.trim();
+            const target = parseFloat(document.getElementById('newGoalTarget').value);
+            const current = parseFloat(document.getElementById('newGoalCurrent').value);
+            const reward = parseFloat(document.getElementById('newGoalReward').value);
+            if (!subject || isNaN(target) || isNaN(reward)) {
+                alert('请填写完整信息');
+                return;
+            }
+            data.goals.push({
+                id: 'goal_' + Date.now(),
+                subject, target, current: current || 0, reward,
+                achieved: false, locked: false
+            });
+            saveData(data);
+            render();
+            renderAdmin();
+            document.getElementById('newGoalSubject').value = '';
+            document.getElementById('newGoalTarget').value = '';
+            document.getElementById('newGoalCurrent').value = '';
+            document.getElementById('newGoalReward').value = '';
+        }
+
+        function deleteGoal(id) {
+            if (!confirm('确定删除这个目标？')) return;
+            data.goals = data.goals.filter(g => g.id !== id);
+            saveData(data);
+            render();
+            renderAdmin();
+        }
+
+        function renderAdminRanks() {
+            const list = document.getElementById('adminRankList');
+            list.innerHTML = '';
+            data.rankGoals.forEach(goal => {
+                const div = document.createElement('div');
+                div.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee;font-size:14px;flex-wrap:wrap;gap:8px;';
+                div.innerHTML = `
+                    <span>${goal.name} — 当前第${goal.current}名 — 奖¥${goal.reward} ${goal.achieved ? '✅' : (goal.locked ? '🔒' : '')}</span>
+                    <div style="display:flex;gap:6px;">
+                        <input type="number" value="${goal.current}" style="width:60px;padding:4px;border:1px solid #ddd;border-radius:4px;" onchange="updateRankCurrent('${goal.id}', this.value)">
+                        <button class="btn btn-primary" style="padding:4px 10px;font-size:12px;" onclick="editRank('${goal.id}')">编辑</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function updateRankCurrent(id, value) {
+            const goal = data.rankGoals.find(g => g.id === id);
+            if (goal) {
+                goal.current = parseInt(value) || 999;
+                saveData(data);
+                render();
+                renderAdmin();
+            }
+        }
+
+        function renderAdminHabits() {
+            const list = document.getElementById('adminHabitList');
+            list.innerHTML = '';
+            data.habitGoals.forEach(goal => {
+                const div = document.createElement('div');
+                div.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee;font-size:14px;flex-wrap:wrap;gap:8px;';
+                const periodText = goal.period === 'week' ? '每周' : '每月';
+                const claimedText = goal.claimed ? ' ✅已领' : '';
+                div.innerHTML = `
+                    <span>${goal.name} — ${periodText}${goal.current}/${goal.target} — 奖¥${goal.reward}${claimedText}</span>
+                    <div style="display:flex;gap:6px;">
+                        <input type="number" value="${goal.current}" style="width:60px;padding:4px;border:1px solid #ddd;border-radius:4px;" onchange="updateHabitCurrent('${goal.id}', this.value)">
+                        <button class="btn btn-primary" style="padding:4px 10px;font-size:12px;" onclick="editHabit('${goal.id}')">编辑</button>
+                        <button class="btn btn-danger" style="padding:4px 10px;font-size:12px;" onclick="deleteHabit('${goal.id}')">删除</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function updateHabitCurrent(id, value) {
+            const goal = data.habitGoals.find(g => g.id === id);
+            if (goal) {
+                goal.current = parseInt(value) || 0;
+                saveData(data);
+                render();
+                renderAdmin();
+            }
+        }
+
+        function addNewHabit() {
+            const name = document.getElementById('newHabitName').value.trim();
+            const target = parseInt(document.getElementById('newHabitTarget').value);
+            const reward = parseFloat(document.getElementById('newHabitReward').value);
+            const period = document.getElementById('newHabitPeriod').value;
+            if (!name || isNaN(target) || isNaN(reward)) {
+                alert('请填写完整信息');
+                return;
+            }
+            data.habitGoals.push({
+                id: 'habit_' + Date.now(),
+                name, target, current: 0, reward, period,
+                claimed: false,
+                linkedTask: ''
+            });
+            saveData(data);
+            render();
+            renderAdmin();
+            document.getElementById('newHabitName').value = '';
+        }
+
+        function deleteHabit(id) {
+            if (!confirm('确定删除这个习惯目标？')) return;
+            data.habitGoals = data.habitGoals.filter(h => h.id !== id);
+            saveData(data);
+            render();
+            renderAdmin();
+        }
+
+        function editHabit(id) {
+            const goal = data.habitGoals.find(g => g.id === id);
+            if (!goal) return;
+            const html = `
+                <div class="form-group"><label>目标名称</label><input type="text" id="editHabitName" value="${goal.name}"></div>
+                <div class="form-group"><label>目标次数</label><input type="number" id="editHabitTarget" value="${goal.target}"></div>
+                <div class="form-group"><label>当前进度</label><input type="number" id="editHabitCurrent" value="${goal.current}"></div>
+                <div class="form-group"><label>奖励金额</label><input type="number" id="editHabitReward" value="${goal.reward}"></div>
+                <div class="form-group">
+                    <label>周期</label>
+                    <select id="editHabitPeriod">
+                        <option value="week" ${goal.period === 'week' ? 'selected' : ''}>每周</option>
+                        <option value="month" ${goal.period === 'month' ? 'selected' : ''}>每月</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>关联任务ID（自动累加用）</label><input type="text" id="editHabitLinked" value="${goal.linkedTask || ''}" placeholder="如: sleep, english_words"></div>
+                <div class="form-group">
+                    <label><input type="checkbox" id="editHabitClaimed" ${goal.claimed ? 'checked' : ''}> 本周期已领取奖励</label>
+                </div>
+            `;
+            showModal('编辑习惯目标', html, () => {
+                goal.name = document.getElementById('editHabitName').value.trim() || goal.name;
+                goal.target = parseInt(document.getElementById('editHabitTarget').value) || goal.target;
+                goal.current = parseInt(document.getElementById('editHabitCurrent').value) || goal.current;
+                goal.reward = parseFloat(document.getElementById('editHabitReward').value) || goal.reward;
+                goal.period = document.getElementById('editHabitPeriod').value;
+                goal.linkedTask = document.getElementById('editHabitLinked').value.trim();
+                goal.claimed = document.getElementById('editHabitClaimed').checked;
+                saveData(data);
+                render();
+                renderAdmin();
+            });
+        }
+
+        function renderAdminShop() {
+            const list = document.getElementById('adminShopList');
+            list.innerHTML = '';
+            data.shop.forEach(item => {
+                const div = document.createElement('div');
+                div.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee;font-size:14px;';
+                div.innerHTML = `
+                    <span>${item.icon} ${item.name} — ¥${item.price}（${item.type === 'entertainment' ? '娱乐' : '实物'}）</span>
+                    <div style="display:flex;gap:6px;">
+                        <button class="btn btn-primary" style="padding:4px 10px;font-size:12px;" onclick="editShopItem('${item.id}')">编辑</button>
+                        <button class="btn btn-danger" style="padding:4px 10px;font-size:12px;" onclick="deleteShopItem('${item.id}')">删除</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function addNewShopItem() {
+            const name = document.getElementById('newShopName').value.trim();
+            const price = parseFloat(document.getElementById('newShopPrice').value);
+            const type = document.getElementById('newShopType').value;
+            if (!name || isNaN(price)) {
+                alert('请填写完整信息');
+                return;
+            }
+            const icons = ['🎁','🎮','📱','🎬','🧋','💵','📚','🍔','👕','🎧'];
+            const icon = icons[Math.floor(Math.random() * icons.length)];
+            data.shop.push({
+                id: 'shop_' + Date.now(),
+                name, price, type, icon
+            });
+            saveData(data);
+            render();
+            renderAdmin();
+            document.getElementById('newShopName').value = '';
+            document.getElementById('newShopPrice').value = '';
+        }
+
+        function deleteShopItem(id) {
+            if (!confirm('确定删除这个商品？')) return;
+            data.shop = data.shop.filter(s => s.id !== id);
+            saveData(data);
+            render();
+            renderAdmin();
+        }
+
+        function changeAdminPwd() {
+            const newPwd = document.getElementById('newAdminPwd').value.trim();
+            if (!newPwd || newPwd.length < 4) {
+                alert('密码至少4位');
+                return;
+            }
+            data.adminPwd = newPwd;
+            saveData(data);
+            alert('密码修改成功！');
+            document.getElementById('newAdminPwd').value = '';
+        }
+
+        // ==================== 数据导出导入（跨设备同步） ====================
+        function exportData() {
+            const exportObj = {
+                balance: data.balance,
+                tasks: data.tasks,
+                goals: data.goals,
+                rankGoals: data.rankGoals,
+                habitGoals: data.habitGoals,
+                shop: data.shop,
+                records: data.records,
+                history: data.history,
+                streaks: data.streaks,
+                lastDate: data.lastDate,
+                adminPwd: data.adminPwd,
+                _exportTime: new Date().toLocaleString('zh-CN'),
+                _version: '1.0'
+            };
+            const jsonStr = JSON.stringify(exportObj);
+            // 压缩：用Base64编码减少文本长度
+            const compressed = btoa(encodeURIComponent(jsonStr));
+            document.getElementById('exportDataText').value = compressed;
+            alert('导出文本已生成！点击"复制到剪贴板"，然后发到微信即可。');
+        }
+
+        function copyExportData() {
+            const text = document.getElementById('exportDataText').value;
+            if (!text) {
+                alert('请先生成导出文本！');
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                alert('已复制到剪贴板！去微信粘贴发送吧。');
+            }).catch(() => {
+                // 降级方案
+                const textarea = document.getElementById('exportDataText');
+                textarea.select();
+                document.execCommand('copy');
+                alert('已复制到剪贴板！去微信粘贴发送吧。');
+            });
+        }
+
+        function importData() {
+            const text = document.getElementById('importDataText').value.trim();
+            if (!text) {
+                alert('请先粘贴数据！');
+                return;
+            }
+            try {
+                // 解压：Base64解码
+                const jsonStr = decodeURIComponent(atob(text));
+                const imported = JSON.parse(jsonStr);
+
+                // 验证数据完整性
+                if (!imported.tasks || !imported.goals) {
+                    alert('数据格式不正确，导入失败！');
+                    return;
+                }
+
+                if (!confirm('⚠️ 导入将覆盖当前所有数据（余额、记录、任务进度等），确定继续？')) return;
+
+                // 覆盖数据
+                data.balance = imported.balance || 0;
+                data.tasks = imported.tasks || data.tasks;
+                data.goals = imported.goals || data.goals;
+                data.rankGoals = imported.rankGoals || data.rankGoals;
+                data.habitGoals = imported.habitGoals || data.habitGoals;
+                data.shop = imported.shop || data.shop;
+                data.records = imported.records || [];
+                data.history = imported.history || {};
+                data.streaks = imported.streaks || { sleep: 0, study: 0 };
+                data.lastDate = imported.lastDate || new Date().toDateString();
+                data.adminPwd = imported.adminPwd || data.adminPwd;
+
+                saveData(data);
+                document.getElementById('importDataText').value = '';
+                alert('✅ 数据导入成功！页面将刷新。');
+                location.reload();
+            } catch (e) {
+                alert('导入失败！数据可能损坏或格式错误。\n错误: ' + e.message);
+            }
+        }
+
+        // ==================== 编辑功能 ====================
+        function editTask(id) {
+            const task = data.tasks.find(t => t.id === id);
+            if (!task) return;
+            const dayNames = ['日','一','二','三','四','五','六'];
+            const daysHtml = [0,1,2,3,4,5,6].map(d => {
+                const checked = task.days && task.days.includes(d) ? 'checked' : '';
+                return `<label style="display:flex;align-items:center;gap:4px;font-size:13px;">
+                    <input type="checkbox" class="edit-day-check" value="${d}" ${checked}> ${dayNames[d]}
+                </label>`;
+            }).join('');
+            const html = `
+                <div class="form-group"><label>任务名称</label><input type="text" id="editTaskName" value="${task.name}"></div>
+                <div class="form-group"><label>奖励金额</label><input type="number" id="editTaskReward" value="${task.reward}"></div>
+                <div class="form-group">
+                    <label>适用星期</label>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">${daysHtml}</div>
+                </div>
+            `;
+            showModal('编辑任务', html, () => {
+                const name = document.getElementById('editTaskName').value.trim();
+                const reward = parseFloat(document.getElementById('editTaskReward').value) || 5;
+                const days = Array.from(document.querySelectorAll('.edit-day-check:checked')).map(cb => parseInt(cb.value));
+                if (!name || days.length === 0) return;
+                task.name = name;
+                task.reward = reward;
+                task.days = days;
+                saveData(data);
+                render();
+                renderAdmin();
+            });
+        }
+
+        function editGoal(id) {
+            const goal = data.goals.find(g => g.id === id);
+            if (!goal) return;
+            const html = `
+                <div class="form-group"><label>科目</label><input type="text" id="editGoalSubject" value="${goal.subject}"></div>
+                <div class="form-group"><label>目标分数</label><input type="number" id="editGoalTarget" value="${goal.target}"></div>
+                <div class="form-group"><label>当前分数</label><input type="number" id="editGoalCurrent" value="${goal.current}"></div>
+                <div class="form-group"><label>奖励金额</label><input type="number" id="editGoalReward" value="${goal.reward}"></div>
+            `;
+            showModal('编辑考试目标', html, () => {
+                goal.subject = document.getElementById('editGoalSubject').value.trim() || goal.subject;
+                goal.target = parseFloat(document.getElementById('editGoalTarget').value) || goal.target;
+                goal.current = parseFloat(document.getElementById('editGoalCurrent').value) || goal.current;
+                goal.reward = parseFloat(document.getElementById('editGoalReward').value) || goal.reward;
+                saveData(data);
+                render();
+                renderAdmin();
+            });
+        }
+
+        function editRank(id) {
+            const goal = data.rankGoals.find(g => g.id === id);
+            if (!goal) return;
+            const html = `
+                <div class="form-group"><label>目标名称</label><input type="text" id="editRankName" value="${goal.name}"></div>
+                <div class="form-group"><label>目标排名（数字越小越难）</label><input type="number" id="editRankTarget" value="${goal.target}"></div>
+                <div class="form-group"><label>当前排名</label><input type="number" id="editRankCurrent" value="${goal.current}"></div>
+                <div class="form-group"><label>奖励金额</label><input type="number" id="editRankReward" value="${goal.reward}"></div>
+            `;
+            showModal('编辑排名目标', html, () => {
+                goal.name = document.getElementById('editRankName').value.trim() || goal.name;
+                goal.target = parseInt(document.getElementById('editRankTarget').value) || goal.target;
+                goal.current = parseInt(document.getElementById('editRankCurrent').value) || goal.current;
+                goal.reward = parseFloat(document.getElementById('editRankReward').value) || goal.reward;
+                saveData(data);
+                render();
+                renderAdmin();
+            });
+        }
+
+        function editShopItem(id) {
+            const item = data.shop.find(s => s.id === id);
+            if (!item) return;
+            const html = `
+                <div class="form-group"><label>商品名称</label><input type="text" id="editShopName" value="${item.name}"></div>
+                <div class="form-group"><label>价格</label><input type="number" id="editShopPrice" value="${item.price}"></div>
+                <div class="form-group">
+                    <label>分类</label>
+                    <select id="editShopType">
+                        <option value="entertainment" ${item.type === 'entertainment' ? 'selected' : ''}>娱乐</option>
+                        <option value="physical" ${item.type === 'physical' ? 'selected' : ''}>实物/现金</option>
+                    </select>
+                </div>
+            `;
+            showModal('编辑商品', html, () => {
+                item.name = document.getElementById('editShopName').value.trim() || item.name;
+                item.price = parseFloat(document.getElementById('editShopPrice').value) || item.price;
+                item.type = document.getElementById('editShopType').value;
+                saveData(data);
+                render();
+                renderAdmin();
+            });
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ 确定要清空所有数据吗？余额、记录、历史全部消失，不可恢复！')) {
+                localStorage.removeItem('studySystem_v2');
+                location.reload();
+            }
+        }
+
+        // ==================== 初始化 ====================
+        checkNewDay();
+        render();
+        // 页面加载后自动尝试从服务器同步（延迟2秒，避免阻塞页面渲染）
+        setTimeout(autoSyncFromServer, 2000);
+    </script>
+</body>
+</html>

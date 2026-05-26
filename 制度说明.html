@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习激励系统 - 制度说明</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.8;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 40px;
+        }
+        h1 {
+            text-align: center;
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #333;
+            font-size: 20px;
+            margin: 30px 0 15px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        h3 {
+            color: #555;
+            font-size: 16px;
+            margin: 20px 0 10px;
+        }
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        .highlight-box h3 {
+            color: white;
+            margin-top: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #667eea;
+        }
+        tr:hover { background: #f8f9fa; }
+        .reward { color: #f5576c; font-weight: bold; }
+        .pass { color: #28a745; font-weight: bold; }
+        .warning { color: #ff9800; font-weight: bold; }
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 14px;
+        }
+        .rule-list {
+            padding-left: 20px;
+        }
+        .rule-list li {
+            margin: 8px 0;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 6px;
+        }
+        .badge-daily { background: #e3f2fd; color: #1976d2; }
+        .badge-weekly { background: #f3e5f5; color: #7b1fa2; }
+        .badge-goal { background: #e8f5e9; color: #388e3c; }
+        .badge-penalty { background: #ffebee; color: #c62828; }
+        .print-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+        }
+        .print-btn:hover { background: #5a6fd6; }
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; padding: 20px; }
+            .print-btn { display: none; }
+        }
+        @media (max-width: 600px) {
+            .container { padding: 20px; }
+            h1 { font-size: 24px; }
+            table { font-size: 12px; }
+            th, td { padding: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 学习激励系统制度说明</h1>
+        <div class="subtitle">版本：2025年5月 | 适用对象：高一学生</div>
+
+        <div class="highlight-box">
+            <h3>💡 核心理念</h3>
+            <p>本系统通过"挣积分→兑奖励"的正向循环，将学习成果、良好习惯转化为可量化的收益。所有奖励均需通过实际努力获得，家长只负责验证与发放，不凭空赠与。</p>
+        </div>
+
+        <h2>一、货币规则</h2>
+        <ul class="rule-list">
+            <li>系统内使用虚拟货币（¥），<strong>1¥ = 1元人民币</strong></li>
+            <li>余额可通过完成任务、达成目标获得</li>
+            <li>余额可用于兑换商店中的娱乐时间或实物奖励</li>
+            <li>余额<strong>不可透支</strong>，余额不足时无法兑换</li>
+            <li>家长可在管理后台查看余额，兑现时按余额等值支付现金</li>
+        </ul>
+
+        <h2>二、打卡任务奖励 <span class="badge badge-daily">日常</span> <span class="badge badge-weekly">周常</span></h2>
+        <p>每日/每周完成指定任务即可获得奖励，任务分为<strong>学习任务</strong>和<strong>家务劳动</strong>两大类。</p>
+
+        <h3>📖 学习任务</h3>
+        <table>
+            <tr><th>任务内容</th><th>奖励</th><th>频率</th></tr>
+            <tr><td>11:00前上床关灯睡觉</td><td class="reward">+¥5</td><td>每天</td></tr>
+            <tr><td>背诵20个单词，晚上家长抽查过关</td><td class="reward">+¥3</td><td>周一至周五</td></tr>
+            <tr><td>周五下午学习英语课程1-2课（有学习记录）</td><td class="reward">+¥10</td><td>每周五</td></tr>
+            <tr><td>周六上午深度学习2小时（家长监督）</td><td class="reward">+¥15</td><td>每周六</td></tr>
+            <tr><td>周六整理本周错题，家长检查成果</td><td class="reward">+¥10</td><td>每周六</td></tr>
+        </table>
+
+        <h3>🏠 家务劳动</h3>
+        <table>
+            <tr><th>任务内容</th><th>奖励</th><th>频率</th></tr>
+            <tr><td>倒垃圾 / 扔垃圾袋</td><td class="reward">+¥1</td><td>每天</td></tr>
+            <tr><td>洗衣服并晾晒 / 收纳自己衣服</td><td class="reward">+¥5</td><td>每周六</td></tr>
+            <tr><td>周末洗碗 / 收拾餐桌一次</td><td class="reward">+¥3</td><td>周六、周日</td></tr>
+            <tr><td>整理自己房间（床铺+桌面+地面）</td><td class="reward">+¥5</td><td>每周六</td></tr>
+        </table>
+
+        <div class="note">
+            <strong>打卡规则：</strong>点击任务左侧圆圈完成打卡，奖励即时到账。当日任务当日完成，次日自动重置。已完成的任务再次点击可取消，奖励会扣除。
+        </div>
+
+        <h2>三、考试目标奖励 <span class="badge badge-goal">阶梯解锁</span></h2>
+        <p>每科从及格线到满分，设置阶梯式目标。<strong>达成前一目标后，自动解锁下一目标。</strong></p>
+
+        <h3>📐 分数规则</h3>
+        <ul class="rule-list">
+            <li><strong>语文、数学、英语</strong>：满分150分，及格线90分，每10分一档</li>
+            <li><strong>物理、化学、生物</strong>：满分100分，及格线60分，每10分一档</li>
+        </ul>
+
+        <h3>🎯 当前各科目标与奖励</h3>
+        <table>
+            <tr><th>科目</th><th>当前分数</th><th>第一档目标</th><th>奖励</th><th>状态</th></tr>
+            <tr><td>语文（满分150）</td><td>99</td><td class="pass">90分</td><td class="reward">¥30</td><td class="pass">✅ 可领取</td></tr>
+            <tr><td>数学（满分150）</td><td>118</td><td class="pass">90分</td><td class="reward">¥30</td><td class="pass">✅ 可领取</td></tr>
+            <tr><td>英语（满分150）</td><td>46</td><td class="warning">90分</td><td class="reward">¥50</td><td>还差44分</td></tr>
+            <tr><td>物理（满分100）</td><td>55</td><td class="warning">60分</td><td class="reward">¥50</td><td>还差5分</td></tr>
+            <tr><td>化学（满分100）</td><td>37</td><td class="warning">60分</td><td class="reward">¥50</td><td>还差23分</td></tr>
+            <tr><td>生物（满分100）</td><td>82</td><td class="pass">60分</td><td class="reward">¥30</td><td class="pass">✅ 可领取</td></tr>
+        </table>
+
+        <h3>📊 完整阶梯奖励表</h3>
+        <table>
+            <tr><th>语数英（150分制）</th><th>奖励</th><th>物化生（100分制）</th><th>奖励</th></tr>
+            <tr><td>90分（及格）</td><td class="reward">¥30~50</td><td>60分（及格）</td><td class="reward">¥30~50</td></tr>
+            <tr><td>100分</td><td class="reward">¥50</td><td>70分</td><td class="reward">¥80</td></tr>
+            <tr><td>110分</td><td class="reward">¥80</td><td>80分</td><td class="reward">¥120</td></tr>
+            <tr><td>120分</td><td class="reward">¥120</td><td>90分</td><td class="reward">¥180</td></tr>
+            <tr><td>130分</td><td class="reward">¥180</td><td>100分（满分）</td><td class="reward">¥250</td></tr>
+            <tr><td>140分</td><td class="reward">¥250~350</td><td>-</td><td>-</td></tr>
+            <tr><td>150分（满分）</td><td class="reward">¥350~500</td><td>-</td><td>-</td></tr>
+        </table>
+
+        <div class="note">
+            <strong>领取方式：</strong>考试出分后，在"目标墙"页面点击"达成目标，领取奖励"按钮，输入管理员密码后奖励到账。家长需核实成绩单后再告知密码。
+        </div>
+
+        <h2>四、年级排名奖励 <span class="badge badge-goal">逐级解锁</span></h2>
+        <p>月考、期中期末考试年级排名达标可获得高额奖励，排名越靠前奖励越高。</p>
+        <table>
+            <tr><th>目标排名</th><th>奖励</th><th>解锁条件</th></tr>
+            <tr><td>年级前300名</td><td class="reward">¥300</td><td>初始解锁</td></tr>
+            <tr><td>年级前200名</td><td class="reward">¥400</td><td>达成前300名后解锁</td></tr>
+            <tr><td>年级前150名</td><td class="reward">¥500</td><td>达成前200名后解锁</td></tr>
+            <tr><td>年级前100名</td><td class="reward">¥800</td><td>达成前150名后解锁</td></tr>
+            <tr><td>年级前50名</td><td class="reward">¥1000</td><td>达成前100名后解锁</td></tr>
+        </table>
+        <div class="note">
+            <strong>当前状态：</strong>当前排名999名，第一档"前300名"已解锁，达标后即可领取¥300。
+        </div>
+
+        <h2>五、习惯目标奖励 <span class="badge badge-goal">周期结算</span></h2>
+        <p>长期坚持良好习惯，每周/每月结算一次额外奖励。</p>
+        <table>
+            <tr><th>习惯目标</th><th>目标次数</th><th>奖励</th><th>周期</th></tr>
+            <tr><td>一周早睡5天以上</td><td>5次</td><td class="reward">¥20</td><td>每周一重置</td></tr>
+            <tr><td>一周单词打卡5天以上</td><td>5次</td><td class="reward">¥15</td><td>每周一重置</td></tr>
+            <tr><td>一个月不透支余额</td><td>整月</td><td class="reward">¥100</td><td>每月1日重置</td></tr>
+        </table>
+        <div class="note">
+            <strong>自动累加：</strong>早睡和单词打卡完成当日任务后，系统会自动累加习惯进度，无需手动操作。达成后需要家长输入密码领取奖励。
+        </div>
+
+        <h2>六、连击奖励</h2>
+        <p>连续保持优秀状态，额外获得连击奖金。</p>
+        <table>
+            <tr><th>连击类型</th><th>条件</th><th>奖励</th></tr>
+            <tr><td>🔥 早睡连击</td><td>连续3天11:00前睡觉</td><td class="reward">+¥10</td></tr>
+            <tr><td>📚 全勤连击</td><td>连续3天完成当日所有任务</td><td class="reward">+¥15</td></tr>
+        </table>
+        <div class="note">
+            连击达成后自动发放奖励并清零重新计数。如果有一天没做到，连击中断，需重新开始。
+        </div>
+
+        <h2>七、兑换商店 <span class="badge badge-goal">消费</span></h2>
+        <p>余额可在兑换商店消费，兑换娱乐时间或实物奖励。兑换需家长确认兑现。</p>
+
+        <h3>🎮 娱乐兑换</h3>
+        <table>
+            <tr><th>商品</th><th>价格</th></tr>
+            <tr><td>1小时游戏时间</td><td class="reward">¥15</td></tr>
+            <tr><td>周末2小时游戏</td><td class="reward">¥25</td></tr>
+            <tr><td>1小时短视频</td><td class="reward">¥10</td></tr>
+            <tr><td>周末看电影一次</td><td class="reward">¥40</td></tr>
+        </table>
+
+        <h3>🎁 实物 / 现金兑换</h3>
+        <table>
+            <tr><th>商品</th><th>价格</th></tr>
+            <tr><td>零食 / 奶茶基金20元</td><td class="reward">¥20</td></tr>
+            <tr><td>提现50元现金</td><td class="reward">¥50</td></tr>
+            <tr><td>提现100元现金</td><td class="reward">¥100</td></tr>
+            <tr><td>提现200元现金</td><td class="reward">¥200</td></tr>
+            <tr><td>提现500元现金</td><td class="reward">¥500</td></tr>
+            <tr><td>自选书籍一本</td><td class="reward">¥80</td></tr>
+            <tr><td>外出聚餐 / 活动一次</td><td class="reward">¥100</td></tr>
+            <tr><td>自定义购买任何东西</td><td class="reward">自行定价</td></tr>
+        </table>
+
+        <div class="note">
+            <strong>兑换规则：</strong>点击商品即可兑换，余额实时扣除。兑换成功后找家长兑现实物或现金。自定义购买可填写任何想要的东西和金额。
+        </div>
+
+        <h2>八、惩罚机制 <span class="badge badge-penalty">扣款</span></h2>
+        <ul class="rule-list">
+            <li>出现违纪行为（如上课玩手机被抓、作业抄袭、考试作弊等），家长可在系统中记录惩罚</li>
+            <li>惩罚需填写原因和扣款金额，直接从余额中扣除</li>
+            <li>惩罚记录永久保留在收支明细中</li>
+            <li>如余额为0，惩罚记为负分，需通过后续任务补齐</li>
+        </ul>
+        <div class="note">
+            <strong>示例：</strong>上课玩手机被抓 → 记录惩罚，扣除¥10。惩罚不是目的，目的是建立"行为有代价"的意识。
+        </div>
+
+        <h2>九、管理员权限（家长专用）</h2>
+        <ul class="rule-list">
+            <li><strong>管理员密码</strong>：默认1234，可在"管理→系统设置"中修改</li>
+            <li><strong>考试/排名/习惯奖励领取</strong>：均需输入管理员密码，防止虚报成绩</li>
+            <li><strong>余额调整</strong>：家长可手动增减余额</li>
+            <li><strong>任务/目标/商品管理</strong>：可增删改所有内容</li>
+            <li><strong>数据同步</strong>：支持导出/导入或服务器实时同步多台设备</li>
+        </ul>
+
+        <h2>十、数据安全与同步</h2>
+        <ul class="rule-list">
+            <li>所有数据保存在浏览器本地，无需注册账号</li>
+            <li>支持<strong>导出/导入</strong>：在管理后台生成文本，通过微信发送，在另一台设备粘贴导入</li>
+            <li>支持<strong>服务器同步</strong>：配置服务器后，电脑和手机数据实时同步</li>
+            <li>长按"本周统计"标签2秒可清空所有数据（谨慎操作）</li>
+        </ul>
+
+        <div class="highlight-box" style="margin-top: 40px;">
+            <h3>📌 给孩子的几句话</h3>
+            <p>这个系统里的每一分钱，都是你靠自己的努力换来的。不管是早起背单词、整理错题，还是考试进步，都是你应得的。</p>
+            <p style="margin-top:10px">家长愿意出钱，但只愿意为<strong>真实的进步</strong>买单。虚报成绩、打卡作弊，一经发现全部清零。</p>
+            <p style="margin-top:10px">你的数学能考118分，说明你完全有能力学好。英语46分、化学37分不是因为你笨，是因为还没开始。先从每天20个单词、整理一道错题做起，一步一步来。</p>
+        </div>
+    </div>
+
+    <button class="print-btn" onclick="window.print()">🖨️ 打印 / 保存为PDF</button>
+</body>
+</html>
