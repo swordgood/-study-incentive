@@ -516,6 +516,12 @@
             </div>
         </div>
 
+        <div style="text-align:center;margin-bottom:16px;">
+            <a href="游戏规则.html" style="display:inline-block;padding:8px 18px;background:rgba(255,255,255,0.25);color:white;text-decoration:none;border-radius:20px;font-size:13px;transition:all 0.2s;">
+                📖 第一次用？先看游戏规则
+            </a>
+        </div>
+
         <!-- 标签页切换 -->
         <div class="tabs">
             <button class="tab active" onclick="switchTab('tasks')">📋 今日打卡</button>
@@ -724,6 +730,32 @@
                     </div>
                 </div>
 
+                <!-- 假期规划 -->
+                <div class="card">
+                    <div class="card-title"><span class="icon">🏖️</span> 假期规划</div>
+                    <div style="display:flex;flex-direction:column;gap:12px;">
+                        <div style="font-size:13px;color:#666;">
+                            选择假期模板和起始日期，一键生成假期打卡任务。任务只在假期内显示，假期结束后自动隐藏。
+                        </div>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                            <select id="holidayTemplate" style="padding:8px;border:1px solid #ddd;border-radius:6px;">
+                                <option value="">选择假期模板</option>
+                                <option value="gaokao">高考假</option>
+                                <option value="summer">暑假（7周）</option>
+                                <option value="winter">寒假（4周）</option>
+                            </select>
+                            <input type="date" id="holidayStart" style="padding:8px;border:1px solid #ddd;border-radius:6px;">
+                            <span style="font-size:13px;color:#666;">至</span>
+                            <input type="date" id="holidayEnd" style="padding:8px;border:1px solid #ddd;border-radius:6px;">
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn btn-primary" onclick="previewHoliday()">👁️ 预览计划</button>
+                            <button class="btn btn-success" onclick="importHoliday()">✅ 导入打卡任务</button>
+                        </div>
+                        <div id="holidayPreview" style="margin-top:10px;"></div>
+                    </div>
+                </div>
+
                 <!-- 数据同步 -->
                 <div class="card">
                     <div class="card-title"><span class="icon">🔄</span> 数据同步（电脑/手机互传）</div>
@@ -806,7 +838,7 @@
         const DEFAULT_TASKS = [
             // === 学习类 ===
             // 每天必做（家长亲眼确认）
-            { id: 'sleep', name: '11:00前上床关灯睡觉', reward: 5, type: 'daily', icon: '😴', days: [0,1,2,3,4,5,6] },
+            { id: 'sleep', name: '23:00前上床关灯睡觉', reward: 5, type: 'daily', icon: '😴', days: [0,1,2,3,4,5,6] },
             // 周一到周五（回家后可验证）
             { id: 'english_words', name: '每天背诵20个单词，晚上回家家长抽查过关', reward: 3, type: 'daily', icon: '📝', days: [1,2,3,4,5] },
             // 周五（家长19:00回家检查）
@@ -888,7 +920,7 @@
 
         const DEFAULT_SHOP = [
             { id: 'game1', name: '1小时游戏时间', price: 15, type: 'entertainment', icon: '🎮' },
-            { id: 'game2', name: '周末2小时游戏', price: 25, type: 'entertainment', icon: '🕹️' },
+            { id: 'game2', name: '周末2小时游戏', price: 30, type: 'entertainment', icon: '🕹️' },
             { id: 'video', name: '1小时短视频', price: 10, type: 'entertainment', icon: '📱' },
             { id: 'movie', name: '周末看电影一次', price: 40, type: 'entertainment', icon: '🎬' },
             { id: 'snack', name: '零食/奶茶基金20元', price: 20, type: 'physical', icon: '🧋' },
@@ -900,6 +932,54 @@
             { id: 'outing', name: '外出聚餐/活动一次', price: 100, type: 'physical', icon: '🍔' },
             { id: 'anything', name: '自定义购买任何东西', price: 1, type: 'physical', icon: '🛍️' },
         ];
+
+        // ==================== 假期规划模板 ====================
+        const HOLIDAY_TEMPLATES = {
+            gaokao: {
+                name: '高考假（10天）',
+                defaultDays: 10,
+                dailyTasks: [
+                    { name: '早起锻炼30分钟', reward: 5, icon: '🏃', days: [0,1,2,3,4,5,6] },
+                    { name: '上午学习3小时', reward: 15, icon: '📚', days: [0,1,2,3,4,5,6] },
+                    { name: '下午学习3小时', reward: 15, icon: '✏️', days: [0,1,2,3,4,5,6] },
+                    { name: '做家务1项', reward: 3, icon: '🧹', days: [0,1,2,3,4,5,6] },
+                    { name: '22:30前睡觉', reward: 5, icon: '😴', days: [0,1,2,3,4,5,6] },
+                ],
+                extraTasks: [
+                    { dayOffset: 2, name: '模拟考试/全真演练', reward: 20, icon: '📝' },
+                    { dayOffset: 5, name: '模拟考试/全真演练', reward: 20, icon: '📝' },
+                    { dayOffset: 8, name: '模拟考试/全真演练', reward: 20, icon: '📝' },
+                ]
+            },
+            summer: {
+                name: '暑假（7周）',
+                defaultDays: 49,
+                dailyTasks: [
+                    { name: '早起锻炼30分钟', reward: 3, icon: '🏃', days: [0,1,2,3,4,5,6] },
+                    { name: '上午学习3小时', reward: 15, icon: '📚', days: [1,2,3,4,5] },
+                    { name: '下午学习2小时', reward: 10, icon: '✏️', days: [1,2,3,4,5] },
+                    { name: '做家务', reward: 3, icon: '🧹', days: [0,1,2,3,4,5,6] },
+                    { name: '23:00前睡觉', reward: 5, icon: '😴', days: [0,1,2,3,4,5,6] },
+                    { name: '周六整理本周学习', reward: 10, icon: '📂', days: [6] },
+                    { name: '户外运动1小时', reward: 5, icon: '🏀', days: [0,6] },
+                ],
+                extraTasks: []
+            },
+            winter: {
+                name: '寒假（4周）',
+                defaultDays: 28,
+                dailyTasks: [
+                    { name: '早起锻炼20分钟', reward: 3, icon: '🏃', days: [0,1,2,3,4,5,6] },
+                    { name: '上午学习2小时', reward: 10, icon: '📚', days: [1,2,3,4,5] },
+                    { name: '下午学习1.5小时', reward: 8, icon: '✏️', days: [1,2,3,4,5] },
+                    { name: '做家务', reward: 3, icon: '🧹', days: [0,1,2,3,4,5,6] },
+                    { name: '23:00前睡觉', reward: 5, icon: '😴', days: [0,1,2,3,4,5,6] },
+                    { name: '周六整理本周学习', reward: 10, icon: '📂', days: [6] },
+                    { name: '户外运动1小时', reward: 5, icon: '🏀', days: [0,6] },
+                ],
+                extraTasks: []
+            }
+        };
 
         // ==================== 用户登录管理 ====================
         let currentUserKey = '';
@@ -1035,9 +1115,26 @@
             }
         }
 
+        function isHolidayMode(dateKey) {
+            return data.tasks.some(t =>
+                t.type === 'holiday' &&
+                (!t.startDate || dateKey >= t.startDate) &&
+                (!t.endDate || dateKey <= t.endDate)
+            );
+        }
+
         function getTodayTasks() {
             const day = new Date().getDay();
-            return data.tasks.filter(t => t.days && t.days.includes(day));
+            const todayKey = getTodayKey();
+            const holiday = isHolidayMode(todayKey);
+            return data.tasks.filter(t => {
+                if (!t.days || !t.days.includes(day)) return false;
+                if (t.startDate && todayKey < t.startDate) return false;
+                if (t.endDate && todayKey > t.endDate) return false;
+                // 假期模式下只显示假期任务，隐藏日常任务
+                if (holiday && t.type !== 'holiday') return false;
+                return true;
+            });
         }
 
         // 先检查登录状态，再加载数据
@@ -1171,7 +1268,15 @@
                 const yesterdayDay = yesterday.getDay();
 
                 // 计算昨日"应该做的任务"完成数
-                const yesterdayTasks = data.tasks.filter(t => t.days && t.days.includes(yesterdayDay));
+                const yesterdayKeyStr = formatDate(yesterday);
+                const yesterdayHoliday = isHolidayMode(yesterdayKeyStr);
+                const yesterdayTasks = data.tasks.filter(t => {
+                    if (!t.days || !t.days.includes(yesterdayDay)) return false;
+                    if (t.startDate && yesterdayKeyStr < t.startDate) return false;
+                    if (t.endDate && yesterdayKeyStr > t.endDate) return false;
+                    if (yesterdayHoliday && t.type !== 'holiday') return false;
+                    return true;
+                });
                 const completedCount = yesterdayTasks.filter(t => t.completed).length;
                 const sleepDone = yesterdayTasks.find(t => t.id === 'sleep')?.completed;
 
@@ -1188,6 +1293,9 @@
                 const yesterdayTaskStates = {};
                 data.tasks.forEach(t => {
                     if (t.days && t.days.includes(yesterdayDay)) {
+                        if (t.startDate && yesterdayKeyStr < t.startDate) return;
+                        if (t.endDate && yesterdayKeyStr > t.endDate) return;
+                        if (yesterdayHoliday && t.type !== 'holiday') return;
                         yesterdayTaskStates[t.id] = !!t.completed;
                     }
                 });
@@ -1394,7 +1502,15 @@
             const dayNames = ['周日','周一','周二','周三','周四','周五','周六'];
             const dayName = dayNames[day];
             const isToday = selectedDateKey === getTodayKey();
-            const dateTasks = data.tasks.filter(t => t.days && t.days.includes(day));
+            const holiday = isHolidayMode(selectedDateKey);
+            const dateTasks = data.tasks.filter(t => {
+                if (!t.days || !t.days.includes(day)) return false;
+                if (t.startDate && selectedDateKey < t.startDate) return false;
+                if (t.endDate && selectedDateKey > t.endDate) return false;
+                // 假期模式下只显示假期任务，隐藏日常任务
+                if (holiday && t.type !== 'holiday') return false;
+                return true;
+            });
 
             updateDatePickerUI();
 
@@ -1764,9 +1880,38 @@
             alert(`🎉 ${goal.name}达成！奖励¥${goal.reward}已发放！本周已记录${goal.current}次，继续加油！`);
         }
 
+        function getWeeklyGameHours() {
+            let hours = 0;
+            const today = new Date();
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                const key = formatDate(d);
+                const gameRecords = data.records.filter(r =>
+                    r.date === key && (r.desc.includes('兑换: 1小时游戏') || r.desc.includes('兑换: 周末2小时游戏'))
+                );
+                gameRecords.forEach(r => {
+                    if (r.desc.includes('周末2小时游戏')) hours += 2;
+                    else if (r.desc.includes('1小时游戏')) hours += 1;
+                });
+            }
+            return hours;
+        }
+
         function buyItem(itemId) {
             const item = data.shop.find(s => s.id === itemId);
             if (!item) return;
+
+            // 游戏时间每周上限检查（最多2小时）
+            if (itemId === 'game1' || itemId === 'game2') {
+                const weeklyHours = getWeeklyGameHours();
+                const maxHours = 2;
+                const thisHours = itemId === 'game1' ? 1 : 2;
+                if (weeklyHours + thisHours > maxHours) {
+                    alert(`本周游戏时间已兑换 ${weeklyHours} 小时，最多还能兑换 ${Math.max(0, maxHours - weeklyHours)} 小时（每周上限 ${maxHours} 小时）`);
+                    return;
+                }
+            }
 
             // 自定义购买任何东西
             if (itemId === 'anything') {
@@ -1863,7 +2008,7 @@
                 </div>
                 <div class="form-group">
                     <label>扣款金额</label>
-                    <input type="number" id="penaltyAmount" value="10" min="1">
+                    <input type="number" id="penaltyAmount" value="50" min="1">
                 </div>
             `;
             showModal('记录惩罚', html, () => {
@@ -1954,10 +2099,11 @@
             const dayNames = ['日','一','二','三','四','五','六'];
             data.tasks.forEach(task => {
                 const daysStr = task.days ? task.days.map(d => dayNames[d]).join('、') : '每天';
+                const holidayTag = task.startDate ? ` <span style="color:#667eea;font-size:12px;">[${task.startDate}~${task.endDate}]</span>` : '';
                 const div = document.createElement('div');
                 div.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee;font-size:14px;';
                 div.innerHTML = `
-                    <span>${task.icon} ${task.name} — ¥${task.reward}（${daysStr}）</span>
+                    <span>${task.icon} ${task.name} — ¥${task.reward}（${daysStr}）${holidayTag}</span>
                     <div style="display:flex;gap:6px;">
                         <button class="btn btn-primary" style="padding:4px 10px;font-size:12px;" onclick="editTask('${task.id}')">编辑</button>
                         <button class="btn btn-danger" style="padding:4px 10px;font-size:12px;" onclick="deleteTask('${task.id}')">删除</button>
@@ -2413,6 +2559,131 @@
                 render();
                 renderAdmin();
             });
+        }
+
+        function getHolidayDays(startKey, endKey) {
+            const start = new Date(startKey);
+            const end = new Date(endKey);
+            return Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+        }
+
+        function previewHoliday() {
+            const templateKey = document.getElementById('holidayTemplate').value;
+            const startKey = document.getElementById('holidayStart').value;
+            const endKey = document.getElementById('holidayEnd').value;
+            const previewEl = document.getElementById('holidayPreview');
+
+            if (!templateKey || !startKey || !endKey) {
+                previewEl.innerHTML = '<div style="color:#dc3545;font-size:13px;">请先选择模板、起始日期和结束日期</div>';
+                return;
+            }
+            if (endKey < startKey) {
+                previewEl.innerHTML = '<div style="color:#dc3545;font-size:13px;">结束日期不能早于起始日期</div>';
+                return;
+            }
+
+            const template = HOLIDAY_TEMPLATES[templateKey];
+            const days = getHolidayDays(startKey, endKey);
+
+            let html = `<div style="background:#f8f9fa;padding:12px;border-radius:10px;margin-bottom:10px;font-size:13px;">
+                <strong>${template.name}</strong>：${startKey} 至 ${endKey}（共${days}天）
+            </div>`;
+
+            // 显示每日任务
+            html += '<div style="font-weight:bold;margin-bottom:8px;font-size:14px;">每日固定任务：</div>';
+            template.dailyTasks.forEach(task => {
+                const dayNames = ['周日','周一','周二','周三','周四','周五','周六'];
+                const dayStr = task.days.map(d => dayNames[d]).join('、');
+                html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:13px;">
+                    <span>${task.icon} ${task.name}（${dayStr}）</span>
+                    <span style="color:#f5576c;font-weight:bold;">+¥${task.reward}</span>
+                </div>`;
+            });
+
+            // 显示额外任务（只显示在范围内的）
+            const validExtras = template.extraTasks.filter(et => et.dayOffset < days);
+            if (validExtras.length > 0) {
+                html += '<div style="font-weight:bold;margin:12px 0 8px;font-size:14px;">额外任务：</div>';
+                validExtras.forEach(et => {
+                    const d = new Date(startKey);
+                    d.setDate(d.getDate() + et.dayOffset);
+                    const dateStr = formatDate(d);
+                    html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:13px;">
+                        <span>${et.icon} ${et.name}（第${et.dayOffset + 1}天 ${dateStr}）</span>
+                        <span style="color:#f5576c;font-weight:bold;">+¥${et.reward}</span>
+                    </div>`;
+                });
+            }
+
+            previewEl.innerHTML = html;
+        }
+
+        function importHoliday() {
+            const templateKey = document.getElementById('holidayTemplate').value;
+            const startKey = document.getElementById('holidayStart').value;
+            const endKey = document.getElementById('holidayEnd').value;
+
+            if (!templateKey || !startKey || !endKey) {
+                alert('请先选择模板、起始日期和结束日期');
+                return;
+            }
+            if (endKey < startKey) {
+                alert('结束日期不能早于起始日期');
+                return;
+            }
+            if (startKey < getTodayKey()) {
+                alert('起始日期不能是过去');
+                return;
+            }
+
+            const template = HOLIDAY_TEMPLATES[templateKey];
+            const days = getHolidayDays(startKey, endKey);
+
+            if (!confirm(`确认导入「${template.name}」？\n起止时间：${startKey} 至 ${endKey}（共${days}天）\n导入后假期任务将出现在打卡列表中。`)) return;
+
+            // 生成假期任务ID前缀
+            const prefix = 'holiday_' + Date.now() + '_';
+
+            // 导入每日任务
+            template.dailyTasks.forEach((task, idx) => {
+                data.tasks.push({
+                    id: prefix + 'daily_' + idx,
+                    name: task.name,
+                    reward: task.reward,
+                    type: 'holiday',
+                    icon: task.icon,
+                    days: task.days,
+                    completed: false,
+                    startDate: startKey,
+                    endDate: endKey,
+                });
+            });
+
+            // 导入额外任务（只导入在日期范围内的）
+            const validExtras = template.extraTasks.filter(et => et.dayOffset < days);
+            validExtras.forEach((task, idx) => {
+                const d = new Date(startKey);
+                d.setDate(d.getDate() + task.dayOffset);
+                const taskDate = formatDate(d);
+                data.tasks.push({
+                    id: prefix + 'extra_' + idx,
+                    name: task.name,
+                    reward: task.reward,
+                    type: 'holiday',
+                    icon: task.icon,
+                    days: [d.getDay()],
+                    completed: false,
+                    startDate: taskDate,
+                    endDate: taskDate,
+                });
+            });
+
+            saveData(data);
+            render();
+            renderAdmin();
+            document.getElementById('holidayPreview').innerHTML = `<div style="color:#28a745;font-size:14px;padding:10px;background:#d4edda;border-radius:8px;">
+                ✅ 「${template.name}」已导入！共导入 ${template.dailyTasks.length} 个每日任务 + ${validExtras.length} 个额外任务。
+            </div>`;
         }
 
         function clearAllData() {

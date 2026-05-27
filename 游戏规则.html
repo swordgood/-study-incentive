@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习赚钱游戏 - 玩家手册</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 28px;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.85);
+            font-size: 15px;
+            margin-bottom: 24px;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .card-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-title .icon { font-size: 26px; }
+
+        .rule-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+        .rule-item .emoji { font-size: 28px; flex-shrink: 0; }
+        .rule-item .content { flex: 1; }
+        .rule-item .name {
+            font-size: 15px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        .rule-item .desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .rule-item .reward {
+            color: #f5576c;
+            font-weight: bold;
+            font-size: 15px;
+            white-space: nowrap;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        .highlight .name { color: white; }
+        .highlight .desc { color: rgba(255,255,255,0.9); }
+        .highlight .reward { color: #fff3cd; }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .tip-box {
+            background: #e3f2fd;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #1565c0;
+            line-height: 1.7;
+        }
+        .tip-box strong { color: #0d47a1; }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        .back-link a {
+            display: inline-block;
+            padding: 12px 28px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+        }
+        .back-link a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 24px 0;
+            color: rgba(255,255,255,0.6);
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 22px; }
+            .card { padding: 18px; }
+            .card-title { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 学习赚钱游戏</h1>
+        <div class="subtitle">学习 = 赚钱 · 努力 = 现金 · 每分都是真本事</div>
+
+        <div class="card highlight">
+            <div class="card-title"><span class="icon">💡</span> 一句话看懂</div>
+            <p style="font-size:15px;line-height:1.8;">
+                完成学习任务、考试进步、养成好习惯 → 系统给你发「工资」→ 用工资兑换游戏时间、零食、现金。<br>
+                <strong>家长只给真实的进步买单。</strong>
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><span class="icon">📌</span> 怎么赚钱</div>
+
+            <div class="rule-item">
+                <span class="emoji">📋</span>
+                <div class="content">
+                    <div class="name">每天打卡任务</div>
+                    <div class="desc">背单词、早睡、做家务...每天能做的任务，点一下圆圈就完成，钱马上到账。</div>
+                </div>
+                <span class="reward">+¥1~15</span>
+            </div>
+
+            <div class="rule-item">
+                <span class="emoji">🎯</span>
+                <div class="content">
+                    <div class="name">考试达标</div>
+                    <div class="desc">英语90分、数学120分...每升一档都有奖金。必须前一档达成了，才能挑战下一档。</div>
+                </div>
+                <span class="reward">+¥30~500</span>
+            </div>
+
+            <div class="rule-item">
+                <span class="emoji">🏆</span>
+                <div class="content">
+                    <div class="name">年级排名前进</div>
+                    <div class="desc">月考、期中期末，年级排名越靠前，奖金越高。前300名起步，前50名封顶。</div>
+                </div>
+                <span class="reward">+¥300~1000</span>
+            </div>
+
+            <div class="rule-item">
+                <span class="emoji">✨</span>
+                <div class="content">
+                    <div class="name">坚持好习惯</div>
+                    <div class="desc">一周早睡5天以上、一周单词打卡5天以上、一个月不透支余额，都有额外奖金。</div>
+                </div>
+                <span class="reward">+¥15~100</span>
+            </div>
+
+            <div class="rule-item">
+                <span class="emoji">🔥</span>
+                <div class="content">
+                    <div class="name">连击奖励</div>
+                    <div class="desc">连续3天早睡 +¥10，连续3天全勤 +¥15。断了就重新算，保持节奏很关键。</div>
+                </div>
+                <span class="reward">+¥10~15</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><span class="icon">🛒</span> 怎么花钱</div>
+
+            <div class="rule-item">
+                <span class="emoji">🎮</span>
+                <div class="content">
+                    <div class="name">游戏时间</div>
+                    <div class="desc">1小时游戏 ¥15，周末2小时 ¥30。<strong>每周最多只能兑换2小时</strong>，想清楚再花。</div>
+                </div>
+                <span class="reward">¥15~30</span>
+            </div>
+
+            <div class="rule-item">
+                <span class="emoji">📱</span>
+                <div class="content">
+                    <div class="name">短视频 / 电影</div>
+                    <div class="desc">1小时短视频 ¥10，周末看电影一次 ¥40。</div>
+                </div>
+                <span class="reward">¥10~40</span>
+            </div>
+
+            <div class="rule-item">
+                <span class="emoji">💵</span>
+                <div class="content">
+                    <div class="name">提现 / 买东西</div>
+                    <div class="desc">余额可以直接提现成现金，也可以买零食、书籍、聚餐...甚至自定义任何想要的东西。</div>
+                </div>
+                <span class="reward">¥20~500</span>
+            </div>
+
+            <div class="tip-box">
+                <strong>💰 余额规则：</strong>1¥ = 1元人民币，余额不够就不能兑换，不能透支。兑换后找家长兑现。
+            </div>
+        </div>
+
+        <div class="card warning">
+            <div class="card-title"><span class="icon">⚠️</span> 犯规扣钱</div>
+            <p style="font-size:14px;color:#333;line-height:1.8;margin-bottom:10px;">
+                偷偷玩游戏被抓、考试作弊、顶撞老师、撒谎隐瞒成绩...这些行为会被记录惩罚，直接从余额里扣钱。<br>
+                <strong>不是家长想扣你钱，是让你知道：每个行为都有代价。</strong>
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><span class="icon">🔒</span> 重要规则</div>
+
+            <div class="rule-item">
+                <span class="emoji">🔐</span>
+                <div class="content">
+                    <div class="name">考试奖励需要密码</div>
+                    <div class="desc">考试达标后点「领取奖励」需要家长输入密码。别想虚报成绩，家长要看成绩单。</div>
+                </div>
+            </div>
+
+            <div class="rule-item">
+                <span class="emoji">📅</span>
+                <div class="content">
+                    <div class="name">可以补打卡</div>
+                    <div class="desc">今天没开电脑，第二天可以选昨天的日期补打卡，钱照样到账。</div>
+                </div>
+            </div>
+
+            <div class="rule-item">
+                <span class="emoji">📲</span>
+                <div class="content">
+                    <div class="name">手机电脑都能用</div>
+                    <div class="desc">数据存在浏览器里，手机电脑都能打开。换设备可以在管理后台导出/导入数据。</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card highlight">
+            <div class="card-title"><span class="icon">🚀</span> 给你的建议</div>
+            <p style="font-size:15px;line-height:1.8;">
+                你的数学能考118分，说明你完全有能力学好。<br>
+                英语46分、化学37分不是因为笨，是因为还没开始。<br><br>
+                <strong>先从每天20个单词、整理一道错题做起。</strong><br>
+                小步快跑，一点一点来，每一分钱都是你应得的。
+            </p>
+        </div>
+
+        <div class="divider">—— 看完就去做任务吧 ——</div>
+
+        <div class="back-link">
+            <a href="index.html">⬅️ 返回系统，开始赚钱</a>
+        </div>
+    </div>
+</body>
+</html>
