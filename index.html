@@ -335,11 +335,175 @@
             .shop-grid { grid-template-columns: repeat(2, 1fr); }
             .balance-amount { font-size: 36px; }
         }
+
+        /* 日期选择器 */
+        .date-picker-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .date-picker-bar .date-nav-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: white;
+            color: #667eea;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .date-picker-bar .date-nav-btn:hover { background: #667eea; color: white; }
+        .date-picker-bar .date-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .date-picker-bar .date-nav-btn:disabled:hover {
+            background: white;
+            color: #667eea;
+        }
+        .date-picker-bar .date-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .date-picker-bar input[type="date"] {
+            border: 1px solid #ddd;
+            background: white;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+            font-family: inherit;
+            cursor: pointer;
+        }
+        .date-picker-bar .today-btn {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .date-picker-bar .today-btn:hover { opacity: 0.9; }
+        .backdate-hint {
+            font-size: 13px;
+            color: #856404;
+            background: #fff3cd;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        /* 登录遮罩层 */
+        .login-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 360px;
+            text-align: center;
+        }
+        .login-box h2 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 24px;
+            border: none;
+            padding: 0;
+        }
+        .login-box .login-sub {
+            color: #999;
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+        .login-box input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+        }
+        .login-box input:focus {
+            border-color: #667eea;
+        }
+        .login-box .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .login-box .login-btn:hover { opacity: 0.9; }
+        .login-box .login-hint {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #999;
+        }
+        .login-box .login-error {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 8px;
+            min-height: 18px;
+        }
+        .user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .user-badge:hover { background: rgba(255,255,255,0.3); }
     </style>
 </head>
 <body>
+    <!-- 登录遮罩层 -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-box">
+            <h2>🔐 学习激励系统</h2>
+            <div class="login-sub">请输入用户名和密码进入</div>
+            <input type="text" id="loginUser" placeholder="用户名" maxlength="20">
+            <input type="password" id="loginPwd" placeholder="密码（4位以上）" maxlength="20">
+            <div class="login-error" id="loginError"></div>
+            <button class="login-btn" onclick="doLogin()">进入系统</button>
+            <div class="login-hint">不同用户名+密码 = 不同的数据空间<br>数据只存在本设备，不会上传网络</div>
+        </div>
+    </div>
+
     <div class="container">
-        <h1>学习激励系统</h1>
+        <h1>学习激励系统 <span class="user-badge" id="userBadge" onclick="logout()" title="点击切换用户" style="display:none;"></span></h1>
 
         <!-- 余额卡片 -->
         <div class="card balance-card">
@@ -366,6 +530,15 @@
         <div class="tab-content active" id="tab-tasks">
             <div class="card">
                 <div class="card-title"><span class="icon">📋</span> 今日打卡任务 <span style="font-size:13px;color:#999;font-weight:normal;">(点击圆圈完成)</span></div>
+                <div class="date-picker-bar">
+                    <button class="date-nav-btn" onclick="changeDate(-1)">&#8249;</button>
+                    <div class="date-center">
+                        <input type="date" id="datePicker" onchange="onDateChange(this.value)">
+                        <button class="today-btn" onclick="goToday()">今天</button>
+                    </div>
+                    <button class="date-nav-btn" onclick="changeDate(1)" id="nextDateBtn">&#8250;</button>
+                </div>
+                <div id="backdateHint" class="backdate-hint" style="display:none;"></div>
                 <div class="task-list" id="taskList"></div>
             </div>
             <div class="card">
@@ -728,8 +901,94 @@
             { id: 'anything', name: '自定义购买任何东西', price: 1, type: 'physical', icon: '🛍️' },
         ];
 
+        // ==================== 用户登录管理 ====================
+        let currentUserKey = '';
+
+        function getStorageKey() {
+            return currentUserKey ? `studySystem_v2_${currentUserKey}` : 'studySystem_v2';
+        }
+
+        function getSavedUser() {
+            return localStorage.getItem('studySystem_currentUser');
+        }
+
+        function setSavedUser(user, pwd) {
+            const key = btoa(encodeURIComponent(user + ':' + pwd));
+            localStorage.setItem('studySystem_currentUser', JSON.stringify({ user, key }));
+            return key;
+        }
+
+        function doLogin() {
+            const user = document.getElementById('loginUser').value.trim();
+            const pwd = document.getElementById('loginPwd').value.trim();
+            const errorEl = document.getElementById('loginError');
+
+            if (!user || user.length < 1) {
+                errorEl.textContent = '请输入用户名';
+                return;
+            }
+            if (!pwd || pwd.length < 4) {
+                errorEl.textContent = '密码至少4位';
+                return;
+            }
+
+            currentUserKey = setSavedUser(user, pwd);
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('userBadge').style.display = 'inline-flex';
+            document.getElementById('userBadge').textContent = `👤 ${user}（切换）`;
+            document.getElementById('loginUser').value = '';
+            document.getElementById('loginPwd').value = '';
+            errorEl.textContent = '';
+
+            // 重新加载数据
+            data = loadData();
+            // 数据兼容
+            if (!data.rankGoals) data.rankGoals = JSON.parse(JSON.stringify(DEFAULT_RANK_GOALS));
+            if (!data.adminPwd) data.adminPwd = '1234';
+            if (!data.taskHistory) data.taskHistory = {};
+            if (data.habitGoals) {
+                data.habitGoals.forEach(goal => {
+                    if (goal.claimed === undefined) goal.claimed = false;
+                    if (goal.id === 'week_sleep' && !goal.linkedTask) goal.linkedTask = 'sleep';
+                    if (goal.id === 'week_words' && !goal.linkedTask) goal.linkedTask = 'english_words';
+                });
+            }
+            saveData(data);
+            checkNewDay();
+            render();
+        }
+
+        function logout() {
+            if (!confirm('确定要切换用户吗？当前数据已自动保存。')) return;
+            localStorage.removeItem('studySystem_currentUser');
+            currentUserKey = '';
+            document.getElementById('loginOverlay').style.display = 'flex';
+            document.getElementById('userBadge').style.display = 'none';
+            document.getElementById('userBadge').textContent = '';
+            location.reload();
+        }
+
+        function checkLogin() {
+            const saved = getSavedUser();
+            if (saved) {
+                try {
+                    const info = JSON.parse(saved);
+                    currentUserKey = info.key;
+                    document.getElementById('loginOverlay').style.display = 'none';
+                    document.getElementById('userBadge').style.display = 'inline-flex';
+                    document.getElementById('userBadge').textContent = `👤 ${info.user}（切换）`;
+                    return true;
+                } catch (e) {
+                    localStorage.removeItem('studySystem_currentUser');
+                }
+            }
+            document.getElementById('loginOverlay').style.display = 'flex';
+            document.getElementById('userBadge').style.display = 'none';
+            return false;
+        }
+
         function loadData() {
-            const data = localStorage.getItem('studySystem_v2');
+            const data = localStorage.getItem(getStorageKey());
             if (data) {
                 const parsed = JSON.parse(data);
                 // 如果目标结构版本变化，重置目标但保留余额和记录
@@ -755,6 +1014,7 @@
                 shop: JSON.parse(JSON.stringify(DEFAULT_SHOP)),
                 records: [],
                 history: {},
+                taskHistory: {},
                 streaks: { sleep: 0, study: 0 },
                 lastDate: new Date().toDateString(),
                 adminPwd: '1234',
@@ -763,7 +1023,7 @@
         }
 
         function saveData(data) {
-            localStorage.setItem('studySystem_v2', JSON.stringify(data));
+            localStorage.setItem(getStorageKey(), JSON.stringify(data));
             // 如果配置了服务器，自动上传到服务器（不阻塞）
             const cfg = getServerConfig();
             if (cfg.url) {
@@ -780,6 +1040,9 @@
             return data.tasks.filter(t => t.days && t.days.includes(day));
         }
 
+        // 先检查登录状态，再加载数据
+        checkLogin();
+
         let data = loadData();
 
         // 数据兼容：确保旧数据也有新字段
@@ -788,6 +1051,9 @@
         }
         if (!data.adminPwd) {
             data.adminPwd = '1234';
+        }
+        if (!data.taskHistory) {
+            data.taskHistory = {};
         }
         // 习惯目标兼容：添加claimed字段和linkedTask字段
         if (data.habitGoals) {
@@ -918,6 +1184,15 @@
                     sleepDone: !!sleepDone,
                 };
 
+                // 保存昨天每个任务的完成状态到 taskHistory（支持补打卡）
+                const yesterdayTaskStates = {};
+                data.tasks.forEach(t => {
+                    if (t.days && t.days.includes(yesterdayDay)) {
+                        yesterdayTaskStates[t.id] = !!t.completed;
+                    }
+                });
+                data.taskHistory[yesterdayKey] = yesterdayTaskStates;
+
                 // 检查连击（昨天该做的任务全部完成才算）
                 const allDone = yesterdayTasks.length > 0 && yesterdayTasks.every(t => t.completed);
 
@@ -980,6 +1255,7 @@
                 data.tasks.forEach(t => t.completed = false);
 
                 data.lastDate = today;
+                selectedDateKey = getTodayKey();
                 saveData(data);
             }
         }
@@ -993,11 +1269,100 @@
             return formatDate(new Date());
         }
 
+        let selectedDateKey;
+
+        function getTaskCompleted(taskId, dateKey) {
+            if (dateKey === getTodayKey()) {
+                const task = data.tasks.find(t => t.id === taskId);
+                return task ? task.completed : false;
+            }
+            return data.taskHistory[dateKey]?.[taskId] || false;
+        }
+
+        function setTaskCompleted(taskId, dateKey, completed) {
+            if (dateKey === getTodayKey()) {
+                const task = data.tasks.find(t => t.id === taskId);
+                if (task) task.completed = completed;
+            } else {
+                if (!data.taskHistory[dateKey]) data.taskHistory[dateKey] = {};
+                data.taskHistory[dateKey][taskId] = completed;
+            }
+        }
+
+        function updateHistoryForDate(dateKey) {
+            const d = new Date(dateKey);
+            const day = d.getDay();
+            const dayTasks = data.tasks.filter(t => t.days && t.days.includes(day));
+            const completedCount = dayTasks.filter(t => getTaskCompleted(t.id, dateKey)).length;
+            const sleepDone = getTaskCompleted('sleep', dateKey);
+            const earnings = data.records
+                .filter(r => r.date === dateKey && r.amount > 0)
+                .reduce((sum, r) => sum + r.amount, 0);
+
+            data.history[dateKey] = {
+                completed: completedCount,
+                total: dayTasks.length,
+                earnings,
+                sleepDone,
+            };
+        }
+
+        // ==================== 日期切换 ====================
+        function onDateChange(value) {
+            if (!value) return;
+            if (value > getTodayKey()) {
+                alert('不能选择未来日期');
+                document.getElementById('datePicker').value = selectedDateKey;
+                return;
+            }
+            selectedDateKey = value;
+            updateDatePickerUI();
+            renderTasks();
+        }
+
+        function changeDate(delta) {
+            const d = new Date(selectedDateKey);
+            d.setDate(d.getDate() + delta);
+            const newKey = formatDate(d);
+            if (newKey > getTodayKey()) return;
+            selectedDateKey = newKey;
+            updateDatePickerUI();
+            renderTasks();
+        }
+
+        function goToday() {
+            selectedDateKey = getTodayKey();
+            updateDatePickerUI();
+            renderTasks();
+        }
+
+        function updateDatePickerUI() {
+            const picker = document.getElementById('datePicker');
+            if (picker) {
+                picker.value = selectedDateKey;
+                picker.max = getTodayKey();
+            }
+            const nextBtn = document.getElementById('nextDateBtn');
+            if (nextBtn) {
+                nextBtn.disabled = selectedDateKey >= getTodayKey();
+            }
+            const isToday = selectedDateKey === getTodayKey();
+            const hint = document.getElementById('backdateHint');
+            if (hint) {
+                hint.style.display = isToday ? 'none' : 'block';
+                if (!isToday) {
+                    hint.textContent = `正在补录 ${selectedDateKey} 的打卡，点击任务圆圈即可补打卡`;
+                }
+            }
+        }
+
         // ==================== 记录管理 ====================
-        function addRecord(desc, amount) {
+        function addRecord(desc, amount, dateKey) {
+            const date = dateKey || getTodayKey();
+            const isToday = date === getTodayKey();
             data.records.unshift({
-                date: getTodayKey(),
-                time: new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'}),
+                date: date,
+                time: isToday ? new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'}) : '补录',
                 desc,
                 amount,
             });
@@ -1023,27 +1388,38 @@
         function renderTasks() {
             const list = document.getElementById('taskList');
             list.innerHTML = '';
-            const todayTasks = getTodayTasks();
 
-            // 添加今日提示
+            const selectedDate = new Date(selectedDateKey);
+            const day = selectedDate.getDay();
             const dayNames = ['周日','周一','周二','周三','周四','周五','周六'];
-            const dayName = dayNames[new Date().getDay()];
+            const dayName = dayNames[day];
+            const isToday = selectedDateKey === getTodayKey();
+            const dateTasks = data.tasks.filter(t => t.days && t.days.includes(day));
+
+            updateDatePickerUI();
+
+            // 日期提示
             const info = document.createElement('div');
-            info.style.cssText = 'font-size:13px;color:#667eea;margin-bottom:10px;padding:8px 12px;background:#f0f3ff;border-radius:8px;';
-            if (todayTasks.length <= 2) {
-                info.textContent = `今天是${dayName}，任务较少，保证睡眠优先 😴`;
-            } else if (new Date().getDay() === 5) {
-                info.textContent = `今天是${dayName}，下午放学后有黄金学习时间！📚`;
-            } else if (new Date().getDay() === 6) {
-                info.textContent = `今天是${dayName}，本周唯一整块学习时间，把握住！✏️`;
+            if (isToday) {
+                info.style.cssText = 'font-size:13px;color:#667eea;margin-bottom:10px;padding:8px 12px;background:#f0f3ff;border-radius:8px;';
+                if (dateTasks.length <= 2) {
+                    info.textContent = `今天是${dayName}，任务较少，保证睡眠优先 😴`;
+                } else if (day === 5) {
+                    info.textContent = `今天是${dayName}，下午放学后有黄金学习时间！📚`;
+                } else if (day === 6) {
+                    info.textContent = `今天是${dayName}，本周唯一整块学习时间，把握住！✏️`;
+                } else {
+                    info.textContent = `今天是${dayName}，共${dateTasks.length}个任务`;
+                }
             } else {
-                info.textContent = `今天是${dayName}，共${todayTasks.length}个任务`;
+                info.style.cssText = 'font-size:13px;color:#856404;margin-bottom:10px;padding:8px 12px;background:#fff3cd;border-radius:8px;';
+                info.textContent = `📅 ${selectedDateKey}（${dayName}）的打卡任务`;
             }
             list.appendChild(info);
 
             // 按学习类、家务类分组显示
-            const studyTasks = todayTasks.filter(t => !['trash','laundry','dishes','room'].includes(t.id));
-            const houseTasks = todayTasks.filter(t => ['trash','laundry','dishes','room'].includes(t.id));
+            const studyTasks = dateTasks.filter(t => !['trash','laundry','dishes','room'].includes(t.id));
+            const houseTasks = dateTasks.filter(t => ['trash','laundry','dishes','room'].includes(t.id));
 
             if (studyTasks.length > 0) {
                 const studyLabel = document.createElement('div');
@@ -1063,12 +1439,13 @@
         }
 
         function createTaskEl(task) {
+            const completed = getTaskCompleted(task.id, selectedDateKey);
             const div = document.createElement('div');
-            div.className = `task-item ${task.completed ? 'completed' : ''}`;
+            div.className = `task-item ${completed ? 'completed' : ''}`;
             div.innerHTML = `
                 <div class="task-left">
-                    <div class="task-check ${task.completed ? 'checked' : ''}" onclick="toggleTask('${task.id}')">
-                        ${task.completed ? '✓' : ''}
+                    <div class="task-check ${completed ? 'checked' : ''}" onclick="toggleTask('${task.id}')">
+                        ${completed ? '✓' : ''}
                     </div>
                     <span class="task-name">${task.icon} ${task.name}</span>
                 </div>
@@ -1294,26 +1671,34 @@
             const task = data.tasks.find(t => t.id === taskId);
             if (!task) return;
 
-            task.completed = !task.completed;
-            if (task.completed) {
+            const completed = !getTaskCompleted(taskId, selectedDateKey);
+            setTaskCompleted(taskId, selectedDateKey, completed);
+
+            if (completed) {
                 data.balance += task.reward;
-                addRecord(`完成: ${task.name}`, task.reward);
-                // 自动累加关联的习惯目标进度
-                data.habitGoals.forEach(goal => {
-                    if (goal.linkedTask === task.id && goal.current < goal.target) {
-                        goal.current++;
-                    }
-                });
+                addRecord(`完成: ${task.name}`, task.reward, selectedDateKey);
+                // 习惯目标只在今天打卡时自动累加
+                if (selectedDateKey === getTodayKey()) {
+                    data.habitGoals.forEach(goal => {
+                        if (goal.linkedTask === task.id && goal.current < goal.target) {
+                            goal.current++;
+                        }
+                    });
+                }
             } else {
                 data.balance -= task.reward;
-                addRecord(`取消: ${task.name}`, -task.reward);
-                // 取消时回退关联的习惯目标进度
-                data.habitGoals.forEach(goal => {
-                    if (goal.linkedTask === task.id && goal.current > 0) {
-                        goal.current--;
-                    }
-                });
+                addRecord(`取消: ${task.name}`, -task.reward, selectedDateKey);
+                // 习惯目标只在今天取消时回退
+                if (selectedDateKey === getTodayKey()) {
+                    data.habitGoals.forEach(goal => {
+                        if (goal.linkedTask === task.id && goal.current > 0) {
+                            goal.current--;
+                        }
+                    });
+                }
             }
+
+            updateHistoryForDate(selectedDateKey);
             saveData(data);
             render();
         }
@@ -1474,7 +1859,7 @@
             const html = `
                 <div class="form-group">
                     <label>惩罚原因</label>
-                    <input type="text" id="penaltyReason" placeholder="例如：上课玩手机被抓">
+                    <input type="text" id="penaltyReason" placeholder="例如：偷偷玩游戏被抓">
                 </div>
                 <div class="form-group">
                     <label>扣款金额</label>
@@ -1508,7 +1893,7 @@
             statsTab.addEventListener('mousedown', () => {
                 pressTimer = setTimeout(() => {
                     if (confirm('确定要清空所有数据吗？此操作不可恢复！')) {
-                        localStorage.removeItem('studySystem_v2');
+                        localStorage.removeItem(getStorageKey());
                         location.reload();
                     }
                 }, 2000);
@@ -1518,7 +1903,7 @@
             statsTab.addEventListener('touchstart', () => {
                 pressTimer = setTimeout(() => {
                     if (confirm('确定要清空所有数据吗？此操作不可恢复！')) {
-                        localStorage.removeItem('studySystem_v2');
+                        localStorage.removeItem(getStorageKey());
                         location.reload();
                     }
                 }, 2000);
@@ -1860,11 +2245,12 @@
                 shop: data.shop,
                 records: data.records,
                 history: data.history,
+                taskHistory: data.taskHistory,
                 streaks: data.streaks,
                 lastDate: data.lastDate,
                 adminPwd: data.adminPwd,
                 _exportTime: new Date().toLocaleString('zh-CN'),
-                _version: '1.0'
+                _version: '1.1'
             };
             const jsonStr = JSON.stringify(exportObj);
             // 压缩：用Base64编码减少文本长度
@@ -1918,6 +2304,7 @@
                 data.shop = imported.shop || data.shop;
                 data.records = imported.records || [];
                 data.history = imported.history || {};
+                data.taskHistory = imported.taskHistory || {};
                 data.streaks = imported.streaks || { sleep: 0, study: 0 };
                 data.lastDate = imported.lastDate || new Date().toDateString();
                 data.adminPwd = imported.adminPwd || data.adminPwd;
@@ -2030,12 +2417,19 @@
 
         function clearAllData() {
             if (confirm('⚠️ 确定要清空所有数据吗？余额、记录、历史全部消失，不可恢复！')) {
-                localStorage.removeItem('studySystem_v2');
+                localStorage.removeItem(getStorageKey());
                 location.reload();
             }
         }
 
+        // 回车键登录
+        document.getElementById('loginPwd').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') doLogin();
+        });
+
         // ==================== 初始化 ====================
+        selectedDateKey = getTodayKey();
+        updateDatePickerUI();
         checkNewDay();
         render();
         // 页面加载后自动尝试从服务器同步（延迟2秒，避免阻塞页面渲染）
